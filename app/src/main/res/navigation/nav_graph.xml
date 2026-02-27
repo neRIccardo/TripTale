@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/listaViaggiFragment">
+    <fragment
+        android:id="@+id/listaViaggiFragment"
+        android:name="com.example.triptale.ListaViaggiFragment"
+        android:label="fragment_lista_viaggi"
+        tools:layout="@layout/fragment_lista_viaggi" >
+        <action
+            android:id="@+id/action_listaViaggiFragment_to_aggiungiViaggioFragment"
+            app:destination="@id/aggiungiViaggioFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/aggiungiViaggioFragment"
+        android:name="com.example.triptale.AggiungiViaggioFragment"
+        android:label="fragment_aggiungi_viaggio"
+        tools:layout="@layout/fragment_aggiungi_viaggio" />
+</navigation>
