@@ -1,10 +1,11 @@
 package com.example.triptale;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
+import java.io.Serializable;
 
 // Questa classe è una tabella del database
 @Entity(tableName = "tabella_viaggi")
-public class Viaggio {
+public class Viaggio implements Serializable {
 
     // Ogni viaggio deve avere un ID unico. "autoGenerate = true" significa che
     // Room conterà da solo (1, 2, 3...) ogni volta che aggiungiamo un viaggio

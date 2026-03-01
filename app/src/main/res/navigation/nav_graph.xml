@@ -12,10 +12,18 @@
         <action
             android:id="@+id/action_listaViaggiFragment_to_aggiungiViaggioFragment"
             app:destination="@id/aggiungiViaggioFragment" />
+        <action
+            android:id="@+id/action_listaViaggiFragment_to_dettaglioViaggioFragment"
+            app:destination="@id/dettaglioViaggioFragment" />
     </fragment>
     <fragment
         android:id="@+id/aggiungiViaggioFragment"
         android:name="com.example.triptale.AggiungiViaggioFragment"
         android:label="fragment_aggiungi_viaggio"
         tools:layout="@layout/fragment_aggiungi_viaggio" />
+    <fragment
+        android:id="@+id/dettaglioViaggioFragment"
+        android:name="com.example.triptale.DettaglioViaggioFragment"
+        android:label="fragment_dettaglio_viaggio"
+        tools:layout="@layout/fragment_dettaglio_viaggio" />
 </navigation>

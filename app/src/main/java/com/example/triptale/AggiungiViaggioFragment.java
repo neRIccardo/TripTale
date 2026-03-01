@@ -1,5 +1,4 @@
 package com.example.triptale;
-
 import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,7 +13,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -106,7 +104,7 @@ public class AggiungiViaggioFragment extends Fragment {
 
                     // Torniamo sul thread principale (UI Thread) per aggiornare lo schermo
                     requireActivity().runOnUiThread(() -> {
-                        Toast.makeText(requireContext(), "Viaggio salvato con successo!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), "Viaggio creato con successo!", Toast.LENGTH_SHORT).show();
                         // Il NavController fa "Indietro" (come premere il tasto back del telefono)
                         Navigation.findNavController(v).popBackStack();
                     });
