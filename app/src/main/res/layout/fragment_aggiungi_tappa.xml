@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#121212"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Nuova tappa"
+            android:textColor="#FFFFFF"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="24dp"/>
+
+        <EditText
+            android:id="@+id/editTitoloTappa"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Es. Tour Eiffel"
+            android:textColorHint="#888888"
+            android:minHeight="48dp"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#E73B18"
+            android:inputType="textCapSentences"
+            android:layout_marginBottom="16dp"/>
+
+        <EditText
+            android:id="@+id/editNoteTappa"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Scrivi una nota del diario qui..."
+            android:textColorHint="#888888"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#E73B18"
+            android:inputType="textMultiLine"
+            android:minLines="4"
+            android:gravity="top"
+            android:layout_marginBottom="24dp"/>
+
+        <ImageView
+            android:id="@+id/imageAnteprimaFoto"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:background="#1E1E1E"
+            android:scaleType="centerCrop"
+            android:layout_marginBottom="16dp"/>
+
+        <Button
+            android:id="@+id/btnScattaFoto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Scatta foto"
+            android:backgroundTint="#333333"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="32dp"/>
+
+        <Button
+            android:id="@+id/btnSalvaTappa"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="SALVA TAPPA"
+            android:backgroundTint="#E73B18"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:textSize="18sp"/>
+
+    </LinearLayout>
+</ScrollView>
