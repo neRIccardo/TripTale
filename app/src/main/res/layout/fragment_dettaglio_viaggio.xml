@@ -38,6 +38,15 @@
         </LinearLayout>
 
         <ImageButton
+            android:id="@+id/btnModificaViaggio"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center_vertical"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_edit"
+            app:tint="#FF5252" />
+
+        <ImageButton
             android:id="@+id/btnEliminaViaggio"
             android:layout_width="48dp"
             android:layout_height="48dp"

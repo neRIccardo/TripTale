@@ -32,6 +32,8 @@ public class DettaglioViaggioFragment extends Fragment {
         ImageButton btnElimina = view.findViewById(R.id.btnEliminaViaggio);
         FloatingActionButton fabAggiungiTappa = view.findViewById(R.id.fabAggiungiTappa);
         LinearLayout contenitoreTappe = view.findViewById(R.id.contenitoreTappe);
+        ImageButton btnModifica = view.findViewById(R.id.btnModificaViaggio);
+
 
         // Controlliamo se ci è stato passato un Bundle
         if (getArguments() != null) {
@@ -65,11 +67,17 @@ public class DettaglioViaggioFragment extends Fragment {
                     .show(); // Mostriamo la finestra a schermo
         });
 
+        // Gestione bottone modifica viaggio
+        btnModifica.setOnClickListener(v -> {
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("viaggio_selezionato", viaggioCorrente);
+            Navigation.findNavController(view).navigate(R.id.action_dettaglioViaggioFragment_to_modificaViaggioFragment, bundle);
+        });
+
         // Gestione bottone aggiunta tappa
         fabAggiungiTappa.setOnClickListener(v -> {
             Bundle bundle = new Bundle();
             bundle.putSerializable("id_del_viaggio", viaggioCorrente.id);
-
             Navigation.findNavController(view).navigate(R.id.action_dettaglioViaggioFragment_to_aggiungiTappaFragment, bundle);
         });
     }

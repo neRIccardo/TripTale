@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -72,6 +73,21 @@ public class ListaViaggiFragment extends Fragment {
                         TextView textDate = itemViaggio.findViewById(R.id.textDateViaggio);
                         textTitolo.setText(viaggio.titolo);
                         textDate.setText(viaggio.dataInizio + " - " + viaggio.dataFine);
+                        ImageView imageCopertina = itemViaggio.findViewById(R.id.imageCopertina);
+
+                        if (viaggio.imagePath != null) {
+                            try {
+                                // Proviamo a caricare la foto salvata
+                                imageCopertina.setImageURI(android.net.Uri.parse(viaggio.imagePath));
+                            } catch (SecurityException e) {
+                                // Se i permessi sono saltati o la foto non esiste più,
+                                // non facciamo crashare l'app mettendo l'icona di default
+                                imageCopertina.setImageResource(android.R.drawable.ic_menu_camera);
+                            }
+                        } else {
+                            // Se non c'è proprio il percorso, mettiamo l'icona di default
+                            imageCopertina.setImageResource(android.R.drawable.ic_menu_camera);
+                        }
 
                         // Gestiamo il click sul singolo rettangolino
                         itemViaggio.setOnClickListener(v -> {

@@ -16,6 +16,7 @@ public class Viaggio implements Serializable {
     public String titolo;
     public String dataInizio;
     public String dataFine;
+    public String imagePath;
 
     // Per definire un nuovo viaggio
     public Viaggio(String titolo, String dataInizio, String dataFine) {

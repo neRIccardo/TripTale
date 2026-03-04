@@ -3,6 +3,7 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Delete;
+import androidx.room.Update;
 import java.util.List;
 
 @Dao
@@ -11,6 +12,9 @@ public interface ViaggioDAO {
     // Comando per SALVARE un nuovo viaggio
     @Insert
     void inserisciViaggio(Viaggio viaggio);
+
+    @Update
+    void aggiornaViaggio(Viaggio viaggio);
 
     // Comando per LEGGERE tutti i viaggi salvati
     @Query("SELECT * FROM tabella_viaggi")
