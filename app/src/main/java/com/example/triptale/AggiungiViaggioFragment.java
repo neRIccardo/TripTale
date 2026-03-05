@@ -21,11 +21,9 @@ import java.util.Locale;
 
 public class AggiungiViaggioFragment extends Fragment {
 
-    // Colleghiamo il Java alla sua grafica (XML)
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // "Gonfiamo" il layout vuoto che Android Studio ha creato per questo Fragment
         return inflater.inflate(R.layout.fragment_aggiungi_viaggio, container, false);
     }
 
@@ -46,7 +44,7 @@ public class AggiungiViaggioFragment extends Fragment {
         editDataInizio.setOnClickListener(v -> mostraCalendario(editDataInizio));
         editDataFine.setOnClickListener(v -> mostraCalendario(editDataFine));
 
-        // Definiamo cosa succede se tocchi il pulsante di salvataggio
+        // --- GESTIONE BOTTONE SALVATAGGIO VIAGGIO ---
         btnSalva.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -74,7 +72,7 @@ public class AggiungiViaggioFragment extends Fragment {
                     Toast.makeText(requireContext(), "Seleziona la data di ritorno!", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                // CONTROLLO LOGICO DELLE DATE (L'inizio non può essere dopo la fine)
+                // Controllo logico delle date (L'inizio non può essere dopo la fine)
                 SimpleDateFormat formatoData = new SimpleDateFormat("dd/MM/yyyy", Locale.ITALY);
                 try {
                     Date dataPartenza = formatoData.parse(dataInizio);
@@ -90,11 +88,7 @@ public class AggiungiViaggioFragment extends Fragment {
                     Log.e("ErroreData", "Impossibile leggere la data inserita", e);
                 }
 
-                // --- INIZIO SALVATAGGIO NEL DATABASE ---
-
-                // Creiamo il nostro oggetto Java con i dati inseriti dall'utente
                 Viaggio nuovoViaggio = new Viaggio(titolo, dataInizio, dataFine);
-                // Creaiamo un thread in background per non far laggare/congelare la grafica (UI Thread) a causa del salvataggio
                 new Thread(() -> {
                     // Recuperiamo il database
                     AppDatabase db = AppDatabase.getInstance(requireContext());
@@ -112,7 +106,10 @@ public class AggiungiViaggioFragment extends Fragment {
             }
         });
     }
-    // Funzione per aprire il calendario
+
+    // =========================================================================
+    // METODO PER APRERE IL CALENDARIO
+    // =========================================================================
     private void mostraCalendario(EditText casellaDaRiempire) {
         // Prendiamo la data di oggi per aprire il calendario sul giorno giusto
         Calendar calendario = Calendar.getInstance();
@@ -125,7 +122,7 @@ public class AggiungiViaggioFragment extends Fragment {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                 // Attenzione: i mesi in Java partono da 0 (Gennaio = 0), quindi aggiungiamo 1
-                String dataScelta = String.format(Locale.ITALY, "%02d/%02d/%04d", dayOfMonth, (month + 1), year);
+                String dataScelta = String.format(Locale.getDefault(), "%02d/%02d/%04d", dayOfMonth, (month + 1), year);
                 casellaDaRiempire.setText(dataScelta); // Scriviamo la data nella casella
 
                 // Togliamo subito l'errore rosso non appena l'utente sceglie una data

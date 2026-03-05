@@ -1,5 +1,4 @@
 package com.example.triptale;
-
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,7 +7,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -18,11 +16,9 @@ import java.util.List;
 
 public class ListaViaggiFragment extends Fragment {
 
-    // Colleghiamo il Java alla sua grafica (XML)
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // "Gonfiamo" il layout vuoto che Android Studio ha creato per questo Fragment
         return inflater.inflate(R.layout.fragment_lista_viaggi, container, false);
     }
 
@@ -30,15 +26,12 @@ public class ListaViaggiFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Troviamo il pulsante "+" nella grafica
         FloatingActionButton fab = view.findViewById(R.id.fabAggiungiViaggio);
 
-        // Gli diciamo cosa fare quando viene cliccato
+        // --- GESTIONE BOTTONE AGGIUNGI VIAGGIO ---
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // NAVCONTROLLER in azione
-                // Gli diciamo di navigare (navigate) seguendo la freccia del grafo
                 Navigation.findNavController(view).navigate(R.id.action_listaViaggiFragment_to_aggiungiViaggioFragment);
             }
         });
@@ -59,7 +52,7 @@ public class ListaViaggiFragment extends Fragment {
                 contenitoreViaggi.removeAllViews();
 
                 if (viaggiSalvati.isEmpty()) {
-                    // Se la lista è vuota: nascondiamo la lista e mostriamo il testo di "default"
+                    // Se la lista è vuota nascondiamo la lista e mostriamo il testo di "default"
                     scrollView.setVisibility(View.GONE);
                     textEmptyState.setVisibility(View.VISIBLE);
                 } else {
@@ -89,7 +82,7 @@ public class ListaViaggiFragment extends Fragment {
                             imageCopertina.setImageResource(android.R.drawable.ic_menu_camera);
                         }
 
-                        // Gestiamo il click sul singolo rettangolino
+                        // --- GESTIONE CLICK SUL SINGOLO VIAGGIO ---
                         itemViaggio.setOnClickListener(v -> {
                             // Creiamo il Bundle e serializziamo Viaggio
                             Bundle bundle = new Bundle();

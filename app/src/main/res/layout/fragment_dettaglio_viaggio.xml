@@ -44,7 +44,7 @@
             android:layout_gravity="center_vertical"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@android:drawable/ic_menu_edit"
-            app:tint="#FF5252" />
+            app:tint="#4CAF50" />
 
         <ImageButton
             android:id="@+id/btnEliminaViaggio"

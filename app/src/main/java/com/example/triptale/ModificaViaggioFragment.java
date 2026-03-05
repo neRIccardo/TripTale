@@ -31,7 +31,9 @@ public class ModificaViaggioFragment extends Fragment {
     private ImageView imageCopertina;
     private String nuovoPercorsoImmagine = null; // Qui salveremo la foto scelta
 
-    // Questo oggetto si mette in ascolto: quando la galleria si chiude, cattura la foto scelta
+    // =========================================================================
+    // OGGETTO PER GESTIRE L'INTENT DELLA GALLERIA
+    // =========================================================================
     private final ActivityResultLauncher<Intent> apriGalleriaLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
@@ -97,7 +99,7 @@ public class ModificaViaggioFragment extends Fragment {
         editDataInizio.setOnClickListener(v -> mostraCalendario(editDataInizio));
         editDataFine.setOnClickListener(v -> mostraCalendario(editDataFine));
 
-        // Gestione scelta copertina
+        // --- GESTIONE BOTTONE SCATTO FOTO ---
         btnScattaFoto.setOnClickListener(v -> {
             // ACTION_OPEN_DOCUMENT assegna automaticamente un permesso temporaneo in lettura
             // Non serve richiedere l'autorizzazione all'utente, a contrario di ACTION_PICK
@@ -109,7 +111,7 @@ public class ModificaViaggioFragment extends Fragment {
             apriGalleriaLauncher.launch(intentGalleria);
         });
 
-        // Update modifiche nel DB
+        // --- GESTIONE BOTTONE SALVATAGGIO VIAGGIO ---
         btnSalva.setOnClickListener(v -> {
             String titolo = editTitolo.getText().toString().trim();
             String dataInizio = editDataInizio.getText().toString().trim();
@@ -134,7 +136,7 @@ public class ModificaViaggioFragment extends Fragment {
                 Toast.makeText(requireContext(), "Seleziona la data di ritorno!", Toast.LENGTH_SHORT).show();
                 return;
             }
-            // CONTROLLO LOGICO DELLE DATE (L'inizio non può essere dopo la fine)
+            // Controllo logico delle date (L'inizio non può essere dopo la fine)
             SimpleDateFormat formatoData = new SimpleDateFormat("dd/MM/yyyy", Locale.ITALY);
             try {
                 Date dataPartenza = formatoData.parse(dataInizio);
@@ -168,7 +170,9 @@ public class ModificaViaggioFragment extends Fragment {
         });
     }
 
-    // Metodo per il calendario (identico a quello in AggiungiViaggio)
+    // =========================================================================
+    // METODO PER APRIRE IL CALENDARIO
+    // =========================================================================
     private void mostraCalendario(EditText casellaDaRiempire) {
         Calendar calendario = Calendar.getInstance();
         int anno = calendario.get(Calendar.YEAR);
@@ -178,7 +182,7 @@ public class ModificaViaggioFragment extends Fragment {
         DatePickerDialog dialog = new DatePickerDialog(requireContext(), new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                String dataScelta = String.format(Locale.ITALY, "%02d/%02d/%04d", dayOfMonth, (month + 1), year);
+                String dataScelta = String.format(Locale.getDefault(), "%02d/%02d/%04d", dayOfMonth, (month + 1), year);
                 casellaDaRiempire.setText(dataScelta);
                 casellaDaRiempire.setError(null);
             }

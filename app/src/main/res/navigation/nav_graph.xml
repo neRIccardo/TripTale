@@ -32,6 +32,9 @@
         <action
             android:id="@+id/action_dettaglioViaggioFragment_to_modificaViaggioFragment"
             app:destination="@id/modificaViaggioFragment" />
+        <action
+            android:id="@+id/action_dettaglioViaggioFragment_to_modificaTappaFragment"
+            app:destination="@id/modificaTappaFragment" />
     </fragment>
     <fragment
         android:id="@+id/aggiungiTappaFragment"
@@ -43,4 +46,8 @@
         android:name="com.example.triptale.ModificaViaggioFragment"
         android:label="fragment_modifica_viaggio"
         tools:layout="@layout/fragment_modifica_viaggio" />
+    <fragment
+        android:id="@+id/modificaTappaFragment"
+        android:name="com.example.triptale.ModificaTappaFragment"
+        android:label="ModificaTappaFragment" />
 </navigation>

@@ -4,6 +4,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,7 +35,6 @@ public class DettaglioViaggioFragment extends Fragment {
         LinearLayout contenitoreTappe = view.findViewById(R.id.contenitoreTappe);
         ImageButton btnModifica = view.findViewById(R.id.btnModificaViaggio);
 
-
         // Controlliamo se ci è stato passato un Bundle
         if (getArguments() != null) {
             // Estraiamo l'oggetto serializzato usando la stessa chiave definita prima
@@ -47,7 +47,7 @@ public class DettaglioViaggioFragment extends Fragment {
             }
         }
 
-        // Gestione bottone eliminazione viaggio
+        // --- GESTIONE BOTTONE ELIMINA VIAGGIO ---
         btnElimina.setOnClickListener(v -> {
             // Creiamo la finestra di dialogo (il pop-up)
             new android.app.AlertDialog.Builder(requireContext())
@@ -58,23 +58,23 @@ public class DettaglioViaggioFragment extends Fragment {
                         new Thread(() -> {
                             AppDatabase.getInstance(requireContext()).viaggioDao().eliminaViaggio(viaggioCorrente);
                             requireActivity().runOnUiThread(() -> {
-                                Toast.makeText(requireContext(), "Viaggio eliminato", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(requireContext(), "Viaggio eliminato!", Toast.LENGTH_SHORT).show();
                                 Navigation.findNavController(view).popBackStack();
                             });
                         }).start();
                     })
-                    .setNegativeButton("Annulla", null) // Se clicca annulla, la finestra si chiude da sola e non fa nulla
+                    .setNegativeButton("Annulla", null) // Se clicca annulla, la finestra si chiude da sola
                     .show(); // Mostriamo la finestra a schermo
         });
 
-        // Gestione bottone modifica viaggio
+        // --- GESTIONE BOTTONE MODIFICA VIAGGIO ---
         btnModifica.setOnClickListener(v -> {
             Bundle bundle = new Bundle();
             bundle.putSerializable("viaggio_selezionato", viaggioCorrente);
             Navigation.findNavController(view).navigate(R.id.action_dettaglioViaggioFragment_to_modificaViaggioFragment, bundle);
         });
 
-        // Gestione bottone aggiunta tappa
+        // --- GESTIONE BOTTONE AGGIUNGI TAPPA  ---
         fabAggiungiTappa.setOnClickListener(v -> {
             Bundle bundle = new Bundle();
             bundle.putSerializable("id_del_viaggio", viaggioCorrente.id);
@@ -82,7 +82,9 @@ public class DettaglioViaggioFragment extends Fragment {
         });
     }
 
-    // Metodo per caricare le tappe di un viaggio specifico
+    // =========================================================================
+    // METODO PER CARICARE LE TAPPE E POPOLARE IL LINEAR LAYOUT
+    // =========================================================================
     private void caricaTappe(LinearLayout contenitore) {
         new Thread(() -> {
             // Chiediamo al TappaDAO di darci SOLO le tappe di QUESTO viaggio
@@ -90,18 +92,72 @@ public class DettaglioViaggioFragment extends Fragment {
                     .tappaDao().ottieniTappeDelViaggio(viaggioCorrente.id);
 
             requireActivity().runOnUiThread(() -> {
-                contenitore.removeAllViews(); // Svuotiamo prima di ricaricare
+                contenitore.removeAllViews(); // Svuotiamo prima di ricaricare per evitare duplicati
 
                 for (Tappa tappa : tappeSalvate) {
-                    // Gonfiamo il nostro nuovo rettangolino
+                    // Gonfiamo il nostro nuovo rettangolino (item_tappa.xml)
                     View itemTappa = getLayoutInflater().inflate(R.layout.item_tappa, contenitore, false);
 
+                    // Colleghiamo gli elementi grafici del singolo item
                     TextView textTitolo = itemTappa.findViewById(R.id.textTitoloTappa);
                     TextView textNote = itemTappa.findViewById(R.id.textNoteTappa);
+                    ImageButton btnModifica = itemTappa.findViewById(R.id.btnModificaTappa);
+                    ImageButton btnElimina = itemTappa.findViewById(R.id.btnEliminaTappa);
+                    ImageView imageMiniatura = itemTappa.findViewById(R.id.imageMiniaturaTappa);
+
+                    // Scriviamo i dati
                     textTitolo.setText(tappa.titolo);
                     textNote.setText(tappa.note);
 
-                    // Attacchiamo la tappa allo schermo
+                    // --- GESTIONE IMMAGINE DELLA TAPPA ---
+                    if (tappa.imagePath != null) {
+                        try {
+                            // Carichiamo la foto scattata
+                            imageMiniatura.setImageURI(android.net.Uri.parse(tappa.imagePath));
+                        } catch (Exception e) {
+                            imageMiniatura.setImageResource(android.R.drawable.ic_menu_camera);
+                        }
+                    } else {
+                        // Se non c'è foto, usiamo una icona di default
+                        imageMiniatura.setImageResource(android.R.drawable.ic_menu_camera);
+                    }
+
+                    // --- GESTIONE BOTTONE MODIFICA TAPPA ---
+                    btnModifica.setOnClickListener(v -> {
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable("tappa_selezionata", tappa);
+                        Navigation.findNavController(itemTappa).navigate(R.id.action_dettaglioViaggioFragment_to_modificaTappaFragment, bundle);
+                    });
+
+                    // --- GESTIONE BOTTONE ELIMINA TAPPA ---
+                    btnElimina.setOnClickListener(v -> {
+                        new android.app.AlertDialog.Builder(requireContext())
+                                .setTitle("Elimina Tappa")
+                                .setMessage("Sei sicuro di voler eliminare questa tappa?\nL'azione è irreversibile.")
+                                .setPositiveButton("Elimina", (dialog, which) -> {
+
+                                    new Thread(() -> {
+                                        // Cancelliamo l'eventuale foto della tappa dalla memoria
+                                        if (tappa.imagePath != null) {
+                                            java.io.File fotoDaCancellare = new java.io.File(tappa.imagePath);
+                                            if (fotoDaCancellare.exists()) {
+                                                fotoDaCancellare.delete();
+                                            }
+                                        }
+                                        // Cancelliamo la tappa dal database Room
+                                        AppDatabase.getInstance(requireContext()).tappaDao().eliminaTappa(tappa);
+                                        // Aggiorniamo la grafica
+                                        requireActivity().runOnUiThread(() -> {
+                                            Toast.makeText(requireContext(), "Tappa eliminata!", Toast.LENGTH_SHORT).show();
+                                            // Rigeneriamo la lista di item
+                                            caricaTappe(contenitore);
+                                        });
+                                    }).start();
+                                })
+                                .setNegativeButton("Annulla", null) // Chiude il pop-up
+                                .show();
+                    });
+                    // Attacchiamo la tappa completa allo schermo
                     contenitore.addView(itemTappa);
                 }
             });

@@ -11,13 +11,16 @@ import androidx.room.RoomDatabase;
 @Database(entities = {Viaggio.class, Tappa.class}, version = 1)
 public abstract class AppDatabase extends RoomDatabase {
 
-    // Diciamo al database chi è il DAO
+    // Diciamo al database chi sono i DAO
     public abstract ViaggioDAO viaggioDao();
     public abstract TappaDAO tappaDao();
 
     // Questa variabile terrà in memoria il nostro database aperto
     private static volatile AppDatabase INSTANCE;
 
+    // =========================================================================
+    // METODO PER CREARE UNA ISTANZA DEL DATABASE
+    // =========================================================================
     public static AppDatabase getInstance(Context context) {
         if (INSTANCE == null) {
             synchronized (AppDatabase.class) {

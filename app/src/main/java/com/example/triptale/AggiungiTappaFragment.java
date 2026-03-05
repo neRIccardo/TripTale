@@ -1,20 +1,48 @@
 package com.example.triptale;
+import android.net.Uri;
 import android.os.Bundle;
-
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
-
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class AggiungiTappaFragment extends Fragment {
     private int idViaggioCorrente = -1; // Variabile per ricordare l'ID del viaggio corrente a cui associare la tappa
+    private ImageView imageAnteprima;
+    private String percorsoFotoAttuale = null;
+    private Uri uriFotoTemporanea = null;
+
+    // =========================================================================
+    // OGGETTO PER GESTIRE L'INTENT DELLA FOTOCAMERA
+    // =========================================================================
+    private final ActivityResultLauncher<Uri> scattaFotoLauncher = registerForActivityResult(
+            new ActivityResultContracts.TakePicture(), esitoPositivo -> {
+                if (esitoPositivo) {
+                    // L'utente ha scattato la foto e ha premuto la spunta
+                    // La fotocamera ha riempito il nostro file vuoto
+                    imageAnteprima.setImageURI(uriFotoTemporanea);
+                } else {
+                    // L'utente ha premuto "Indietro" o ha annullato lo scatto
+                    percorsoFotoAttuale = null;
+                }
+            }
+    );
 
     @Nullable
     @Override
@@ -41,13 +69,30 @@ public class AggiungiTappaFragment extends Fragment {
         EditText editNote = view.findViewById(R.id.editNoteTappa);
         Button btnScattaFoto = view.findViewById(R.id.btnScattaFoto);
         Button btnSalva = view.findViewById(R.id.btnSalvaTappa);
+        imageAnteprima = view.findViewById(R.id.imageAnteprimaFoto);
 
-        // Gestione bottone per scattare una foto
+        // --- GESTIONE BOTTONE SCATTO FOTO ---
         btnScattaFoto.setOnClickListener(v -> {
-            Toast.makeText(requireContext(), "Domani apriremo la Fotocamera qui!", Toast.LENGTH_SHORT).show();
+            try {
+                // Creiamo il file vuoto
+                File fileImmagine = creaFileImmagine();
+
+                // Chiediamo al FileProvider di creare un Uri sicuro per questo file
+                uriFotoTemporanea = FileProvider.getUriForFile(
+                        requireContext(),
+                        requireContext().getPackageName() + ".fileprovider",
+                        fileImmagine
+                );
+
+                // Lanciamo la fotocamera passandole l'Uri sicuro
+                scattaFotoLauncher.launch(uriFotoTemporanea);
+
+            } catch (IOException e) {
+                Toast.makeText(requireContext(), "Errore nella creazione del file", Toast.LENGTH_SHORT).show();
+            }
         });
 
-        // Gestione bottone di salvataggio della tappa
+        // --- GESTIONE BOTTONE SALVATGGIO TAPPA ---
         btnSalva.setOnClickListener(v -> {
             String titoloInserito = editTitolo.getText().toString().trim();
             String noteInserite = editNote.getText().toString().trim();
@@ -60,6 +105,7 @@ public class AggiungiTappaFragment extends Fragment {
             }
 
             Tappa nuovaTappa = new Tappa(idViaggioCorrente, titoloInserito, noteInserite);
+            nuovaTappa.imagePath = percorsoFotoAttuale;
             new Thread(() -> {
                 AppDatabase.getInstance(requireContext()).tappaDao().inserisciTappa(nuovaTappa);
                 // Torniamo sul Main Thread per la grafica
@@ -70,5 +116,29 @@ public class AggiungiTappaFragment extends Fragment {
                 });
             }).start();
         });
+    }
+
+    // =========================================================================
+    // METODO PER CREARE UN FILE VUOTO PER LA FOTOCAMERA
+    // =========================================================================
+    private File creaFileImmagine() throws IOException {
+        // Creiamo un nome basato sulla data e ora esatta
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+        String nomeFile = "JPEG_" + timeStamp + "_";
+
+        // Prendiamo la cartella "Pictures" segreta della nostra app
+        File cartellaStorage = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+
+        // Creiamo fisicamente il file vuoto
+        File fileCreato = File.createTempFile(
+                nomeFile,  // prefisso
+                ".jpg",    // suffisso
+                cartellaStorage // cartella
+        );
+
+        // Salviamo il percorso assoluto (es: /storage/emulated/0/Android/data/com.example.../files/Pictures/JPEG_...)
+        // Questo è il percorso che finirà nel nostro Database Room
+        percorsoFotoAttuale = fileCreato.getAbsolutePath();
+        return fileCreato;
     }
 }
