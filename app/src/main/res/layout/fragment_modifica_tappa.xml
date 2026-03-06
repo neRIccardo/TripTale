@@ -1,14 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ModificaTappaFragment">
+    android:background="#121212"
+    android:fillViewport="true">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
 
-</FrameLayout>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Modifica tappa"
+            android:textColor="#FFFFFF"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="24dp"/>
+
+        <EditText
+            android:id="@+id/editTitoloTappaModifica"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Modifica il tittolo qui..."
+            android:textColorHint="#888888"
+            android:minHeight="48dp"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#E73B18"
+            android:inputType="textCapSentences"
+            android:layout_marginBottom="16dp"/>
+
+        <EditText
+            android:id="@+id/editNoteTappaModifica"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColorHint="#888888"
+            android:hint="Modifica le note qui..."
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#E73B18"
+            android:inputType="textMultiLine"
+            android:minLines="4"
+            android:gravity="top"
+            android:layout_marginBottom="24dp"/>
+
+        <ImageView
+            android:id="@+id/imageAnteprimaTappaModifica"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:background="#1E1E1E"
+            android:scaleType="centerCrop"
+            android:layout_marginBottom="16dp"/>
+
+        <Button
+            android:id="@+id/btnScattaFotoTappaModifica"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Scatta una nuovo foto"
+            android:backgroundTint="#333333"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="32dp"/>
+
+        <Button
+            android:id="@+id/btnSalvaTappaModifica"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="SALVA MODIFICHE"
+            android:backgroundTint="#E73B18"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:textSize="18sp"/>
+
+    </LinearLayout>
+</ScrollView>
