@@ -56,7 +56,18 @@ public class DettaglioViaggioFragment extends Fragment {
                     .setPositiveButton("Elimina", (dialog, which) -> {
                         // Se l'utente clicca "Elimina", facciamo partire il Thread di eliminazione
                         new Thread(() -> {
+                            List <Tappa> tappeDelViaggio = AppDatabase.getInstance(requireContext()).tappaDao().ottieniTappeDelViaggio(viaggioCorrente.id);
+                            for(Tappa tappa : tappeDelViaggio) {
+                                // Cancelliamo l'eventuale foto della tappa dalla memoria
+                                if (tappa.imagePath != null) {
+                                    java.io.File fotoDaCancellare = new java.io.File(tappa.imagePath);
+                                    if (fotoDaCancellare.exists()) {
+                                        fotoDaCancellare.delete();
+                                    }
+                                }
+                            }
                             AppDatabase.getInstance(requireContext()).viaggioDao().eliminaViaggio(viaggioCorrente);
+
                             requireActivity().runOnUiThread(() -> {
                                 Toast.makeText(requireContext(), "Viaggio eliminato!", Toast.LENGTH_SHORT).show();
                                 Navigation.findNavController(view).popBackStack();

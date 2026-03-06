@@ -136,7 +136,7 @@ public class AggiungiTappaFragment extends Fragment {
                 cartellaStorage // cartella
         );
 
-        // Salviamo il percorso assoluto (es: /storage/emulated/0/Android/data/com.example.../files/Pictures/JPEG_...)
+        // Salviamo il percorso assoluto (Android/data/com.example.triptale/files/Pictures/JPEG_...)
         // Questo è il percorso che finirà nel nostro Database Room
         percorsoFotoAttuale = fileCreato.getAbsolutePath();
         return fileCreato;
