@@ -35,6 +35,8 @@ public class AggiungiViaggioFragment extends Fragment {
         EditText editDataInizio = view.findViewById(R.id.editDataInizio);
         EditText editDataFine = view.findViewById(R.id.editDataFine);
         Button btnSalva = view.findViewById(R.id.btnSalvaViaggio);
+        EditText editCitta = view.findViewById(R.id.editCittaViaggio);
+
 
         // Blocchiamo la tastiera su queste due caselle
         editDataInizio.setFocusable(false);
@@ -56,6 +58,8 @@ public class AggiungiViaggioFragment extends Fragment {
                 String titolo = editTitolo.getText().toString().trim();
                 String dataInizio = editDataInizio.getText().toString().trim();
                 String dataFine = editDataFine.getText().toString().trim();
+                String citta = editCitta.getText().toString().trim();
+
 
                 if (titolo.isEmpty()) {
                     editTitolo.setError("Inserisci il titolo del viaggio!");
@@ -88,7 +92,7 @@ public class AggiungiViaggioFragment extends Fragment {
                     Log.e("ErroreData", "Impossibile leggere la data inserita", e);
                 }
 
-                Viaggio nuovoViaggio = new Viaggio(titolo, dataInizio, dataFine);
+                Viaggio nuovoViaggio = new Viaggio(titolo, citta, dataInizio, dataFine);
                 new Thread(() -> {
                     // Recuperiamo il database
                     AppDatabase db = AppDatabase.getInstance(requireContext());

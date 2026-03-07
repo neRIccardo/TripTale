@@ -14,13 +14,15 @@ public class Viaggio implements Serializable {
 
     // Colonne della nostra tabella
     public String titolo;
+    public String cittaDestinazione;
     public String dataInizio;
     public String dataFine;
     public String imagePath;
 
     // Per definire un nuovo viaggio
-    public Viaggio(String titolo, String dataInizio, String dataFine) {
+    public Viaggio(String titolo, String cittaDestinazione, String dataInizio, String dataFine) {
         this.titolo = titolo;
+        this.cittaDestinazione = cittaDestinazione;
         this.dataInizio = dataInizio;
         this.dataFine = dataFine;
     }

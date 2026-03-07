@@ -71,6 +71,7 @@ public class ModificaViaggioFragment extends Fragment {
         imageCopertina = view.findViewById(R.id.imageCopertinaViaggio);
         Button btnScattaFoto = view.findViewById(R.id.btnSelezionaFotoCopertina);
         Button btnSalva = view.findViewById(R.id.btnSalvaModifiche);
+        EditText editCitta = view.findViewById(R.id.editCittaModifica);
 
         editDataInizio.setFocusable(false);
         editDataFine.setFocusable(false);
@@ -82,6 +83,7 @@ public class ModificaViaggioFragment extends Fragment {
                 editTitolo.setText(viaggioCorrente.titolo);
                 editDataInizio.setText(viaggioCorrente.dataInizio);
                 editDataFine.setText(viaggioCorrente.dataFine);
+                editCitta.setText(viaggioCorrente.cittaDestinazione);
 
                 if (viaggioCorrente.imagePath != null) {
                     try {
@@ -116,6 +118,7 @@ public class ModificaViaggioFragment extends Fragment {
             String titolo = editTitolo.getText().toString().trim();
             String dataInizio = editDataInizio.getText().toString().trim();
             String dataFine = editDataFine.getText().toString().trim();
+            String citta = editCitta.getText().toString().trim();
 
             editTitolo.setError(null);
             editDataInizio.setError(null);
@@ -154,6 +157,7 @@ public class ModificaViaggioFragment extends Fragment {
 
             // Aggiorniamo l'oggetto viaggioCorrente con i nuovi dati
             viaggioCorrente.titolo = titolo;
+            viaggioCorrente.cittaDestinazione = citta;
             viaggioCorrente.dataInizio = dataInizio;
             viaggioCorrente.dataFine = dataFine;
             viaggioCorrente.imagePath = nuovoPercorsoImmagine; // La nuova foto (o quella vecchia se non l'ha cambiata)

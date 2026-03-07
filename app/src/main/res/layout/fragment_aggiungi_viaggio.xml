@@ -25,7 +25,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
         android:backgroundTint="#E73B18"
-        android:hint="Dove andiamo? (es. Parigi)"
+        android:hint="Dove andiamo?"
         android:inputType="textCapWords"
         android:minHeight="48dp"
         android:textColor="#FFFFFF"
@@ -33,6 +33,32 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/textTitoloPagina" />
+
+    <EditText
+        android:id="@+id/editCittaViaggio"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="#E73B18"
+        android:hint="Città di destinazione"
+        android:inputType="textCapWords"
+        android:minHeight="48dp"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#888888"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/editTitoloViaggio" />
+
+    <TextView
+        android:id="@+id/textAiutoCitta"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Riempi il campo per abilitare il servizio di previsioni meteo"
+        android:textColor="#E73B18"
+        android:textSize="12sp"
+        app:layout_constraintTop_toBottomOf="@id/editCittaViaggio"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <EditText
         android:id="@+id/editDataInizio"
@@ -47,7 +73,7 @@
         android:textColorHint="#888888"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/editTitoloViaggio" />
+        app:layout_constraintTop_toBottomOf="@id/textAiutoCitta" />
 
     <EditText
         android:id="@+id/editDataFine"

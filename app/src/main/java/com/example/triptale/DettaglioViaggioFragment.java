@@ -35,6 +35,11 @@ public class DettaglioViaggioFragment extends Fragment {
         LinearLayout contenitoreTappe = view.findViewById(R.id.contenitoreTappe);
         ImageButton btnModifica = view.findViewById(R.id.btnModificaViaggio);
 
+        // Elementi del meteo
+        android.widget.HorizontalScrollView scrollMeteo = view.findViewById(R.id.scrollMeteo);
+        LinearLayout contenitoreMeteo = view.findViewById(R.id.contenitoreMeteo);
+        TextView textErroreMeteo = view.findViewById(R.id.textErroreMeteo);
+
         // Controlliamo se ci è stato passato un Bundle
         if (getArguments() != null) {
             // Estraiamo l'oggetto serializzato usando la stessa chiave definita prima
@@ -44,6 +49,60 @@ public class DettaglioViaggioFragment extends Fragment {
                 textTitolo.setText(viaggioCorrente.titolo);
                 textDate.setText(viaggioCorrente.dataInizio + " - " + viaggioCorrente.dataFine);
                 caricaTappe(contenitoreTappe);
+
+                // --- CHIAMATA METEO TRAMITE MANAGER ESTERNO ---
+                if (viaggioCorrente.cittaDestinazione != null && !viaggioCorrente.cittaDestinazione.trim().isEmpty()) {
+
+                    // Mostriamo all'utente che stiamo caricando
+                    textErroreMeteo.setVisibility(View.VISIBLE);
+                    textErroreMeteo.setText("Caricamento meteo in corso...");
+                    scrollMeteo.setVisibility(View.GONE);
+
+                    // Richiamiamo il Manager passandogli città, data inizio, data fine e il "Callback"
+                    MeteoManager.ottieniPrevisioni(viaggioCorrente.cittaDestinazione, viaggioCorrente.dataInizio, viaggioCorrente.dataFine, new MeteoManager.MeteoCallback() {
+
+                        @Override
+                        public void onSuccess(List<MeteoManager.Previsione> previsioni) {
+                            // La grafica può essere modificata SOLO sul Main Thread
+                            requireActivity().runOnUiThread(() -> {
+                                // Nascondiamo l'errore e mostriamo la striscia
+                                textErroreMeteo.setVisibility(View.GONE);
+                                scrollMeteo.setVisibility(View.VISIBLE);
+                                contenitoreMeteo.removeAllViews();
+
+                                // Creiamo un quadratino per ogni giorno
+                                for (MeteoManager.Previsione prev : previsioni) {
+                                    View itemMeteo = getLayoutInflater().inflate(R.layout.item_meteo, contenitoreMeteo, false);
+
+                                    TextView textData = itemMeteo.findViewById(R.id.textDataMeteo);
+                                    TextView textIcona = itemMeteo.findViewById(R.id.textIconaMeteo);
+                                    TextView textTemp = itemMeteo.findViewById(R.id.textTempMeteo);
+
+                                    // Inseriamo i dati (arrotondiamo i gradi per togliere i decimali)
+                                    textData.setText(prev.data);
+                                    textIcona.setText(prev.iconaEmoji);
+                                    textTemp.setText(Math.round(prev.tempMin) + "° / " + Math.round(prev.tempMax) + "°");
+                                    contenitoreMeteo.addView(itemMeteo);
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onError(String errorMessage) {
+                            requireActivity().runOnUiThread(() -> {
+                                // Nascondiamo lo scroll e mostriamo l'errore integrato
+                                scrollMeteo.setVisibility(View.GONE);
+                                textErroreMeteo.setVisibility(View.VISIBLE);
+                                textErroreMeteo.setText("🌥️\n" + errorMessage);
+                            });
+                        }
+                    });
+                } else {
+                    // Se la città non è stata inserita affatto
+                    textErroreMeteo.setVisibility(View.VISIBLE);
+                    textErroreMeteo.setText("Inserisci la città di destinazione nel pannello di modifica per vedere il meteo.");
+                    scrollMeteo.setVisibility(View.GONE);
+                }
             }
         }
 
