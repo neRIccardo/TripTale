@@ -126,6 +126,8 @@ public class DettaglioViaggioFragment extends Fragment {
                                 }
                             }
                             AppDatabase.getInstance(requireContext()).viaggioDao().eliminaViaggio(viaggioCorrente);
+                            // Cancellazione notifiche "orfane"
+                            androidx.core.app.NotificationManagerCompat.from(requireContext()).cancel(viaggioCorrente.id);
 
                             requireActivity().runOnUiThread(() -> {
                                 Toast.makeText(requireContext(), "Viaggio eliminato!", Toast.LENGTH_SHORT).show();

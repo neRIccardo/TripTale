@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
         // Creiamo un lavoro periodico che scatta ogni 24 ore
         PeriodicWorkRequest lavoroMeteo = new PeriodicWorkRequest.Builder(
                 MeteoWorker.class,
-                15, TimeUnit.MINUTES
+                    24, TimeUnit.HOURS
         ).build();
 
         // Diciamo ad Android di metterlo in coda.
