@@ -100,6 +100,8 @@ public class AggiungiViaggioFragment extends Fragment {
                     // Inseriamo il viaggio
                     db.viaggioDao().inserisciViaggio(nuovoViaggio);
 
+                    if (!isAdded()) return;
+
                     // Torniamo sul thread principale (UI Thread) per aggiornare lo schermo
                     requireActivity().runOnUiThread(() -> {
                         Toast.makeText(requireContext(), "Viaggio creato con successo!", Toast.LENGTH_SHORT).show();

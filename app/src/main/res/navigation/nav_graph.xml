@@ -15,6 +15,9 @@
         <action
             android:id="@+id/action_listaViaggiFragment_to_dettaglioViaggioFragment"
             app:destination="@id/dettaglioViaggioFragment" />
+        <action
+            android:id="@+id/action_listaViaggiFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
     </fragment>
     <fragment
         android:id="@+id/aggiungiViaggioFragment"
@@ -50,4 +53,8 @@
         android:id="@+id/modificaTappaFragment"
         android:name="com.example.triptale.ModificaTappaFragment"
         android:label="ModificaTappaFragment" />
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.triptale.LoginFragment"
+        android:label="LoginFragment" />
 </navigation>

@@ -1,17 +1,23 @@
 package com.example.triptale;
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+
 import java.util.List;
 
 public class ListaViaggiFragment extends Fragment {
@@ -27,12 +33,36 @@ public class ListaViaggiFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         FloatingActionButton fab = view.findViewById(R.id.fabAggiungiViaggio);
+        ImageButton btnProfiloLogin = view.findViewById(R.id.btnProfiloLogin);
+
 
         // --- GESTIONE BOTTONE AGGIUNGI VIAGGIO ---
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Navigation.findNavController(view).navigate(R.id.action_listaViaggiFragment_to_aggiungiViaggioFragment);
+            }
+        });
+
+        // --- GESTIONE BOTTONE PROFILO / LOGIN ---
+        btnProfiloLogin.setOnClickListener(v -> {
+            FirebaseAuth auth = FirebaseAuth.getInstance();
+
+            if (auth.getCurrentUser() != null) {
+                // Mostriamo il popup di logout se l'utente è loggato
+                new AlertDialog.Builder(requireContext())
+                        .setTitle("Gestione account")
+                        .setMessage("Sei loggato come:\n" + auth.getCurrentUser().getEmail() + "\n\nVuoi disconnetterti?")
+                        .setPositiveButton("Logout", (dialog, which) -> {
+                            auth.signOut();
+                            aggiornaColoreIcona(btnProfiloLogin);
+                            Toast.makeText(requireContext(), "Disconnesso con successo!", Toast.LENGTH_SHORT).show();
+                        })
+                        .setNegativeButton("Annulla", null)
+                        .show();
+            } else {
+                // Andiamo alla schermata di login se l'utente non è loggato
+                Navigation.findNavController(view).navigate(R.id.action_listaViaggiFragment_to_loginFragment);
             }
         });
 
@@ -46,6 +76,8 @@ public class ListaViaggiFragment extends Fragment {
             // Apriamo il Database e richiediamo la lista dei viaggi
             AppDatabase db = AppDatabase.getInstance(requireContext());
             List<Viaggio> viaggiSalvati = db.viaggioDao().ottieniViaggi();
+
+            if (!isAdded()) return;
 
             requireActivity().runOnUiThread(() -> {
                 // Svuotiamo la lista per evitare duplicati se torniamo indietro
@@ -95,5 +127,30 @@ public class ListaViaggiFragment extends Fragment {
                 }
             });
         }).start();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Quando torniamo dalla schermata di login, aggiorniamo il colore
+        if (getView() != null) {
+            ImageButton btnProfiloLogin = getView().findViewById(R.id.btnProfiloLogin);
+            aggiornaColoreIcona(btnProfiloLogin);
+        }
+    }
+
+    // =====================================================================
+    // METODO PER AGGIORNARE IL COLORE DELL'ICONA DEL PROFILO
+    // =====================================================================
+    private void aggiornaColoreIcona(ImageButton btnProfilo) {
+        com.google.firebase.auth.FirebaseAuth auth = com.google.firebase.auth.FirebaseAuth.getInstance();
+
+        if (auth.getCurrentUser() != null) {
+            // UTENTE LOGGATO: coloriamo l'icona di Verde
+            btnProfilo.setColorFilter(android.graphics.Color.parseColor("#4CAF50"));
+        } else {
+            // NON LOGGATO: rimettiamo il colore originale Arancione
+            btnProfilo.setColorFilter(android.graphics.Color.parseColor("#E73B18"));
+        }
     }
 }

@@ -103,6 +103,9 @@ public class ModificaTappaFragment extends Fragment {
             // Aggiorniamo il Database
             new Thread(() -> {
                 AppDatabase.getInstance(requireContext()).tappaDao().aggiornaTappa(tappaCorrente);
+
+                if (!isAdded()) return;
+
                 requireActivity().runOnUiThread(() -> {
                     Toast.makeText(requireContext(), "Tappa aggiornata!", Toast.LENGTH_SHORT).show();
                     Navigation.findNavController(view).popBackStack();

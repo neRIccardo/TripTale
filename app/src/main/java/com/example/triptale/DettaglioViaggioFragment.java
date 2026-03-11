@@ -16,7 +16,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.List;
 
 public class DettaglioViaggioFragment extends Fragment {
-    private Viaggio viaggioCorrente; // Salviamo il viaggio qui per poterlo usare in tutta la classe
+    private Viaggio viaggioCorrente;
 
     @Nullable
     @Override
@@ -50,7 +50,7 @@ public class DettaglioViaggioFragment extends Fragment {
                 textDate.setText(viaggioCorrente.dataInizio + " - " + viaggioCorrente.dataFine);
                 caricaTappe(contenitoreTappe);
 
-                // --- CHIAMATA METEO TRAMITE MANAGER ESTERNO ---
+                // --- CHIAMATA METEO TRAMITE MANAGER ESTERNO E VOLLEY ---
                 if (viaggioCorrente.cittaDestinazione != null && !viaggioCorrente.cittaDestinazione.trim().isEmpty()) {
 
                     // Mostriamo all'utente che stiamo caricando
@@ -58,43 +58,40 @@ public class DettaglioViaggioFragment extends Fragment {
                     textErroreMeteo.setText("Caricamento meteo in corso...");
                     scrollMeteo.setVisibility(View.GONE);
 
-                    // Richiamiamo il Manager passandogli città, data inizio, data fine e il "Callback"
-                    MeteoManager.ottieniPrevisioni(viaggioCorrente.cittaDestinazione, viaggioCorrente.dataInizio, viaggioCorrente.dataFine, new MeteoManager.MeteoCallback() {
+                    // Richiamiamo il Manager
+                    MeteoManager.ottieniPrevisioni(requireContext(), viaggioCorrente.cittaDestinazione, viaggioCorrente.dataInizio, viaggioCorrente.dataFine, new MeteoManager.MeteoCallback() {
 
                         @Override
                         public void onSuccess(List<MeteoManager.Previsione> previsioni) {
-                            // La grafica può essere modificata SOLO sul Main Thread
-                            requireActivity().runOnUiThread(() -> {
-                                // Nascondiamo l'errore e mostriamo la striscia
-                                textErroreMeteo.setVisibility(View.GONE);
-                                scrollMeteo.setVisibility(View.VISIBLE);
-                                contenitoreMeteo.removeAllViews();
+                            if (!isAdded()) return; // Protezione ciclo di vita
 
-                                // Creiamo un quadratino per ogni giorno
-                                for (MeteoManager.Previsione prev : previsioni) {
-                                    View itemMeteo = getLayoutInflater().inflate(R.layout.item_meteo, contenitoreMeteo, false);
+                            textErroreMeteo.setVisibility(View.GONE);
+                            scrollMeteo.setVisibility(View.VISIBLE);
+                            contenitoreMeteo.removeAllViews();
 
-                                    TextView textData = itemMeteo.findViewById(R.id.textDataMeteo);
-                                    TextView textIcona = itemMeteo.findViewById(R.id.textIconaMeteo);
-                                    TextView textTemp = itemMeteo.findViewById(R.id.textTempMeteo);
+                            // Creiamo un quadratino per ogni giorno
+                            for (MeteoManager.Previsione prev : previsioni) {
+                                View itemMeteo = getLayoutInflater().inflate(R.layout.item_meteo, contenitoreMeteo, false);
 
-                                    // Inseriamo i dati (arrotondiamo i gradi per togliere i decimali)
-                                    textData.setText(prev.data);
-                                    textIcona.setText(prev.iconaEmoji);
-                                    textTemp.setText(Math.round(prev.tempMin) + "° / " + Math.round(prev.tempMax) + "°");
-                                    contenitoreMeteo.addView(itemMeteo);
-                                }
-                            });
+                                TextView textData = itemMeteo.findViewById(R.id.textDataMeteo);
+                                TextView textIcona = itemMeteo.findViewById(R.id.textIconaMeteo);
+                                TextView textTemp = itemMeteo.findViewById(R.id.textTempMeteo);
+
+                                // Inseriamo i dati (arrotondiamo i gradi per togliere i decimali)
+                                textData.setText(prev.data);
+                                textIcona.setText(prev.iconaEmoji);
+                                textTemp.setText(Math.round(prev.tempMin) + "° / " + Math.round(prev.tempMax) + "°");
+                                contenitoreMeteo.addView(itemMeteo);
+                            }
                         }
 
                         @Override
                         public void onError(String errorMessage) {
-                            requireActivity().runOnUiThread(() -> {
-                                // Nascondiamo lo scroll e mostriamo l'errore integrato
-                                scrollMeteo.setVisibility(View.GONE);
-                                textErroreMeteo.setVisibility(View.VISIBLE);
-                                textErroreMeteo.setText("🌥️\n" + errorMessage);
-                            });
+                            if (!isAdded()) return; // Protezione ciclo di vita
+
+                            scrollMeteo.setVisibility(View.GONE);
+                            textErroreMeteo.setVisibility(View.VISIBLE);
+                            textErroreMeteo.setText("🌥️\n" + errorMessage);
                         }
                     });
                 } else {
@@ -129,6 +126,8 @@ public class DettaglioViaggioFragment extends Fragment {
                             // Cancellazione notifiche "orfane"
                             androidx.core.app.NotificationManagerCompat.from(requireContext()).cancel(viaggioCorrente.id);
 
+                            if (!isAdded()) return; // Protezione ciclo di vita
+
                             requireActivity().runOnUiThread(() -> {
                                 Toast.makeText(requireContext(), "Viaggio eliminato!", Toast.LENGTH_SHORT).show();
                                 Navigation.findNavController(view).popBackStack();
@@ -162,6 +161,8 @@ public class DettaglioViaggioFragment extends Fragment {
             // Chiediamo al TappaDAO di darci SOLO le tappe di QUESTO viaggio
             List<Tappa> tappeSalvate = AppDatabase.getInstance(requireContext())
                     .tappaDao().ottieniTappeDelViaggio(viaggioCorrente.id);
+
+            if (!isAdded()) return; // Protezione ciclo di vita
 
             requireActivity().runOnUiThread(() -> {
                 contenitore.removeAllViews(); // Svuotiamo prima di ricaricare per evitare duplicati
@@ -218,6 +219,9 @@ public class DettaglioViaggioFragment extends Fragment {
                                         }
                                         // Cancelliamo la tappa dal database Room
                                         AppDatabase.getInstance(requireContext()).tappaDao().eliminaTappa(tappa);
+
+                                        if (!isAdded()) return; // Protezione ciclo di vita
+
                                         // Aggiorniamo la grafica
                                         requireActivity().runOnUiThread(() -> {
                                             Toast.makeText(requireContext(), "Tappa eliminata!", Toast.LENGTH_SHORT).show();

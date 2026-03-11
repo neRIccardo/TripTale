@@ -30,7 +30,10 @@ public class MeteoWorker extends Worker {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         Calendar calOggi = Calendar.getInstance();
         // Resettiamo ore, minuti e secondi per fare un confronto pulito sulle date
-        calOggi.set(Calendar.HOUR_OF_DAY, 0); calOggi.set(Calendar.MINUTE, 0); calOggi.set(Calendar.SECOND, 0); calOggi.set(Calendar.MILLISECOND, 0);
+        calOggi.set(Calendar.HOUR_OF_DAY, 0);
+        calOggi.set(Calendar.MINUTE, 0);
+        calOggi.set(Calendar.SECOND, 0);
+        calOggi.set(Calendar.MILLISECOND, 0);
 
         Calendar calDomani = (Calendar) calOggi.clone();
         calDomani.add(Calendar.DAY_OF_YEAR, 1);
@@ -48,10 +51,10 @@ public class MeteoWorker extends Worker {
                 if (parteDomani || inCorso) {
                     String tipoAvviso = parteDomani ? "Domani avrà inizio il viaggio " : "Goditi il viaggio ";
 
-                    // Semaforo per dire al Worker di aspettare 1 risposta prima di spegnersi
+                    // Semaforo per dire al Worker di aspettare la risposta di Volley prima di spegnersi
                     CountDownLatch latch = new CountDownLatch(1);
 
-                    MeteoManager.ottieniPrevisioni(v.cittaDestinazione, v.dataInizio, v.dataFine, new MeteoManager.MeteoCallback() {
+                    MeteoManager.ottieniPrevisioni(getApplicationContext(), v.cittaDestinazione, v.dataInizio, v.dataFine, new MeteoManager.MeteoCallback() {
                         @Override
                         public void onSuccess(List<MeteoManager.Previsione> previsioni) {
                             String meteoTesto = "";
@@ -65,19 +68,19 @@ public class MeteoWorker extends Worker {
                                     meteoTesto = "\nMeteo di oggi:  " + previsioni.get(0).iconaEmoji + " " + Math.round(previsioni.get(0).tempMin) + "/" + Math.round(previsioni.get(0).tempMax) + "°C";
                                 }
                             }
-                            inviaNotifica(v, tipoAvviso + "\"" + v.titolo + "\"" + "!" + meteoTesto);
-                            latch.countDown();
+                            inviaNotifica(v, tipoAvviso + "\"" + v.titolo + "\"!" + meteoTesto);
+                            latch.countDown(); // Diamo il semaforo verde per chiudere il Worker
                         }
 
                         @Override
                         public void onError(String errorMessage) {
-                            // Se manca internet, mandiamo la notifica senza meteo
-                            inviaNotifica(v, tipoAvviso + "\"" + v.titolo + "\"" + "!\n(Meteo non disponibile)");
-                            latch.countDown();
+                            // Se manca internet o c'è un errore, mandiamo la notifica senza meteo
+                            inviaNotifica(v, tipoAvviso + "\"" + v.titolo + "\"!\n(Meteo non disponibile)");
+                            latch.countDown(); // Diamo il semaforo verde per chiudere il Worker
                         }
                     });
 
-                    // Il Worker si "congela" in questa riga finché il semaforo non viene rilasciato
+                    // Il Worker si "congela" in questa riga finché il semaforo non viene rilasciato da Volley
                     latch.await();
                 }
             } catch (Exception e) {
@@ -107,7 +110,7 @@ public class MeteoWorker extends Worker {
                 .createPendingIntent();
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), "CANALE_VIAGGI")
-                .setSmallIcon(android.R.drawable.ic_dialog_map) //TODO Sostituire con l'icona della tua app
+                .setSmallIcon(android.R.drawable.ic_dialog_map) // Sostituisci se hai un'altra icona
                 .setCategory(NotificationCompat.CATEGORY_REMINDER)
                 .setContentTitle("TripTale ✈️")
                 .setContentText(testoDellaNotifica)

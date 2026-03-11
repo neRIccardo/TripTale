@@ -166,6 +166,8 @@ public class ModificaViaggioFragment extends Fragment {
             new Thread(() -> {
                 AppDatabase.getInstance(requireContext()).viaggioDao().aggiornaViaggio(viaggioCorrente);
 
+                if (!isAdded()) return;
+
                 requireActivity().runOnUiThread(() -> {
                     Toast.makeText(requireContext(), "Viaggio modificato!", Toast.LENGTH_SHORT).show();
                     Navigation.findNavController(view).popBackStack();

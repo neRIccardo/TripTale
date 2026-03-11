@@ -96,6 +96,9 @@ public class AggiungiTappaFragment extends Fragment {
             nuovaTappa.imagePath = percorsoFotoAttuale;
             new Thread(() -> {
                 AppDatabase.getInstance(requireContext()).tappaDao().inserisciTappa(nuovaTappa);
+
+                if (!isAdded()) return;
+
                 // Torniamo sul Main Thread per la grafica
                 requireActivity().runOnUiThread(() -> {
                     Toast.makeText(requireContext(), "Tappa salvata!", Toast.LENGTH_SHORT).show();
