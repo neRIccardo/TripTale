@@ -118,7 +118,7 @@ public class ListaViaggiFragment extends Fragment {
                         itemViaggio.setOnClickListener(v -> {
                             // Creiamo il Bundle e serializziamo Viaggio
                             Bundle bundle = new Bundle();
-                            bundle.putSerializable("viaggio_selezionato", viaggio);
+                            bundle.putParcelable("viaggio_selezionato", viaggio);
                             Navigation.findNavController(v).navigate(R.id.action_listaViaggiFragment_to_dettaglioViaggioFragment, bundle);
                         });
                         // Aggiungiamo il rettangolino dentro il LinearLayout

@@ -41,7 +41,6 @@ dependencies {
     implementation(libs.room.runtime)
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
-    implementation(libs.androidx.work.runtime)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

@@ -48,7 +48,7 @@ public class ModificaTappaFragment extends Fragment {
         Button btnSalva = view.findViewById(R.id.btnSalvaTappaModifica);
 
         if (getArguments() != null) {
-            tappaCorrente = (Tappa) getArguments().getSerializable("tappa_selezionata");
+            tappaCorrente = getArguments().getParcelable("tappa_selezionata");
             if (tappaCorrente != null) {
                 editTitolo.setText(tappaCorrente.titolo);
                 editNote.setText(tappaCorrente.note);

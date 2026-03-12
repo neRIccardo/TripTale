@@ -78,7 +78,7 @@ public class ModificaViaggioFragment extends Fragment {
 
         // Recupero viaggio dal Bundle e precompilazione campi
         if (getArguments() != null) {
-            viaggioCorrente = (Viaggio) getArguments().getSerializable("viaggio_selezionato");
+            viaggioCorrente = getArguments().getParcelable("viaggio_selezionato");
             if (viaggioCorrente != null) {
                 editTitolo.setText(viaggioCorrente.titolo);
                 editDataInizio.setText(viaggioCorrente.dataInizio);

@@ -43,7 +43,7 @@ public class DettaglioViaggioFragment extends Fragment {
         // Controlliamo se ci è stato passato un Bundle
         if (getArguments() != null) {
             // Estraiamo l'oggetto serializzato usando la stessa chiave definita prima
-            viaggioCorrente = (Viaggio) getArguments().getSerializable("viaggio_selezionato");
+            viaggioCorrente = getArguments().getParcelable("viaggio_selezionato");
             if (viaggioCorrente != null) {
                 // Popoliamo l'interfaccia
                 textTitolo.setText(viaggioCorrente.titolo);
@@ -141,14 +141,14 @@ public class DettaglioViaggioFragment extends Fragment {
         // --- GESTIONE BOTTONE MODIFICA VIAGGIO ---
         btnModifica.setOnClickListener(v -> {
             Bundle bundle = new Bundle();
-            bundle.putSerializable("viaggio_selezionato", viaggioCorrente);
+            bundle.putParcelable("viaggio_selezionato", viaggioCorrente);
             Navigation.findNavController(view).navigate(R.id.action_dettaglioViaggioFragment_to_modificaViaggioFragment, bundle);
         });
 
         // --- GESTIONE BOTTONE AGGIUNGI TAPPA  ---
         fabAggiungiTappa.setOnClickListener(v -> {
             Bundle bundle = new Bundle();
-            bundle.putSerializable("id_del_viaggio", viaggioCorrente.id);
+            bundle.putInt("id_del_viaggio", viaggioCorrente.id);
             Navigation.findNavController(view).navigate(R.id.action_dettaglioViaggioFragment_to_aggiungiTappaFragment, bundle);
         });
     }
@@ -198,7 +198,7 @@ public class DettaglioViaggioFragment extends Fragment {
                     // --- GESTIONE BOTTONE MODIFICA TAPPA ---
                     btnModifica.setOnClickListener(v -> {
                         Bundle bundle = new Bundle();
-                        bundle.putSerializable("tappa_selezionata", tappa);
+                        bundle.putParcelable("tappa_selezionata", tappa);
                         Navigation.findNavController(itemTappa).navigate(R.id.action_dettaglioViaggioFragment_to_modificaTappaFragment, bundle);
                     });
 

@@ -12,11 +12,6 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.work.ExistingPeriodicWorkPolicy;
-import androidx.work.PeriodicWorkRequest;
-import androidx.work.WorkManager;
-
-import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -81,22 +76,37 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // =========================================================================
-    // PROGRAMMAZIONE DEL WORKMANAGER (Ogni 24 ore in background)
+    // PROGRAMMAZIONE DEL CONTROLLO GIORNALIERO (Ogni 24 ore in background)
     // =========================================================================
     private void programmaControlloGiornaliero() {
-        // Creiamo un lavoro periodico che scatta ogni 24 ore
-        PeriodicWorkRequest lavoroMeteo = new PeriodicWorkRequest.Builder(
-                MeteoWorker.class,
-                    24, TimeUnit.HOURS
-        ).build();
+        android.app.job.JobScheduler jobScheduler = (android.app.job.JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
+        if (jobScheduler == null) return;
 
-        // Diciamo ad Android di metterlo in coda.
-        // Usiamo "enqueueUniquePeriodicWork" per evitare che aprendo l'app più volte
-        // si creino tanti lavoratori diversi che mandano notifiche doppie
-        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-                "ControlloMeteoViaggi", // "nome" di questo specifico lavoratore
-                ExistingPeriodicWorkPolicy.KEEP, // KEEP = Se c'è già un lavoratore con questo nome, lascialo lavorare e non riavviarlo
-                lavoroMeteo
-        );
+        // Controlliamo se il lavoro con ID 1001 è già stato programmato
+        boolean giaProgrammato = false;
+        for (android.app.job.JobInfo jobInfo : jobScheduler.getAllPendingJobs()) {
+            if (jobInfo.getId() == 1001) {
+                giaProgrammato = true;
+                break;
+            }
+        }
+
+        // Se è già in coda, ci fermiamo qui e non lo riprogrammiamo
+        if (giaProgrammato) {
+            return;
+        }
+
+        // Se invece non esiste (es. la prima volta che apriamo l'app), lo creiamo
+        android.content.ComponentName serviceComponent = new android.content.ComponentName(this, MeteoJobService.class);
+        android.app.job.JobInfo.Builder builder = new android.app.job.JobInfo.Builder(1001, serviceComponent);
+
+        // Esegui ogni 15 minuti (il minimo consentito da Android)
+        builder.setPeriodic(15 * 60 * 1000L);
+
+        // Sopravvivi al riavvio del telefono
+        builder.setPersisted(true);
+
+        // Mettiamo in coda il lavoro
+        jobScheduler.schedule(builder.build());
     }
 }
