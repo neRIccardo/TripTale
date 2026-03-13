@@ -45,7 +45,7 @@ public class Viaggio implements Parcelable {
     }
 
     // "Creator" che Android usa per ricostruire l'oggetto
-    public static final Creator<Viaggio> CREATOR = new Creator<Viaggio>() {
+    public static final Creator<Viaggio> CREATOR = new Creator<>() {
         @Override
         public Viaggio createFromParcel(Parcel in) {
             return new Viaggio(in);

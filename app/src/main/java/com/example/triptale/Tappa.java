@@ -46,7 +46,7 @@ public class Tappa implements Parcelable {
     }
 
     // "Creator" che Android usa per ricostruire l'oggetto
-    public static final Creator<Tappa> CREATOR = new Creator<Tappa>() {
+    public static final Creator<Tappa> CREATOR = new Creator<>() {
         @Override
         public Tappa createFromParcel(Parcel in) {
             return new Tappa(in);
