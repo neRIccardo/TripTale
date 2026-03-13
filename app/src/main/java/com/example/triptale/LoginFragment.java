@@ -56,8 +56,12 @@ public class LoginFragment extends Fragment {
 
             mAuth.signInWithEmailAndPassword(email, password)
                     .addOnSuccessListener(authResult -> {
-                        Toast.makeText(requireContext(), "Accesso effettuato!", Toast.LENGTH_SHORT).show();
-                        Navigation.findNavController(view).popBackStack(); // Torna alla home
+                        // Otteniamo l'ID univoco dell'utente appena loggato
+                        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                        FirebaseManager.sincronizzaTutto(requireContext(), userId, () -> {
+                            Toast.makeText(requireContext(), "Accesso e Sincronizzazione completati!", Toast.LENGTH_SHORT).show();
+                            Navigation.findNavController(view).popBackStack();
+                        });
                     })
                     .addOnFailureListener(e -> {
                         if (e instanceof com.google.firebase.auth.FirebaseAuthInvalidCredentialsException ||
@@ -90,8 +94,12 @@ public class LoginFragment extends Fragment {
 
             mAuth.createUserWithEmailAndPassword(email, password)
                     .addOnSuccessListener(authResult -> {
-                        Toast.makeText(requireContext(), "Account creato con successo!", Toast.LENGTH_SHORT).show();
-                        Navigation.findNavController(view).popBackStack(); // Torna alla home
+                        // Otteniamo l'ID univoco dell'utente appena registrato
+                        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                        FirebaseManager.sincronizzaTutto(requireContext(), userId, () -> {
+                            Toast.makeText(requireContext(), "Accesso e Sincronizzazione completati!", Toast.LENGTH_SHORT).show();
+                            Navigation.findNavController(view).popBackStack();
+                        });
                     })
                     .addOnFailureListener(e -> {
                         if (e instanceof com.google.firebase.auth.FirebaseAuthWeakPasswordException) {

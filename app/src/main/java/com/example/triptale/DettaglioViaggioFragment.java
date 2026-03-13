@@ -3,6 +3,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -17,6 +19,10 @@ import java.util.List;
 
 public class DettaglioViaggioFragment extends Fragment {
     private Viaggio viaggioCorrente;
+    private LinearLayout contenitoreTappe;
+    private HorizontalScrollView scrollMeteo;
+    private LinearLayout contenitoreMeteo;
+    private TextView textErroreMeteo;
 
     @Nullable
     @Override
@@ -32,13 +38,11 @@ public class DettaglioViaggioFragment extends Fragment {
         TextView textDate = view.findViewById(R.id.textDateDettaglio);
         ImageButton btnElimina = view.findViewById(R.id.btnEliminaViaggio);
         FloatingActionButton fabAggiungiTappa = view.findViewById(R.id.fabAggiungiTappa);
-        LinearLayout contenitoreTappe = view.findViewById(R.id.contenitoreTappe);
+        contenitoreTappe = view.findViewById(R.id.contenitoreTappe);
         ImageButton btnModifica = view.findViewById(R.id.btnModificaViaggio);
-
-        // Elementi del meteo
-        android.widget.HorizontalScrollView scrollMeteo = view.findViewById(R.id.scrollMeteo);
-        LinearLayout contenitoreMeteo = view.findViewById(R.id.contenitoreMeteo);
-        TextView textErroreMeteo = view.findViewById(R.id.textErroreMeteo);
+        scrollMeteo = view.findViewById(R.id.scrollMeteo);
+        contenitoreMeteo = view.findViewById(R.id.contenitoreMeteo);
+        textErroreMeteo = view.findViewById(R.id.textErroreMeteo);
 
         // Controlliamo se ci è stato passato un Bundle
         if (getArguments() != null) {
@@ -48,58 +52,6 @@ public class DettaglioViaggioFragment extends Fragment {
                 // Popoliamo l'interfaccia
                 textTitolo.setText(viaggioCorrente.titolo);
                 textDate.setText(viaggioCorrente.dataInizio + " - " + viaggioCorrente.dataFine);
-                caricaTappe(contenitoreTappe);
-
-                // --- CHIAMATA METEO TRAMITE MANAGER ESTERNO E VOLLEY ---
-                if (viaggioCorrente.cittaDestinazione != null && !viaggioCorrente.cittaDestinazione.trim().isEmpty()) {
-
-                    // Mostriamo all'utente che stiamo caricando
-                    textErroreMeteo.setVisibility(View.VISIBLE);
-                    textErroreMeteo.setText("Caricamento meteo in corso...");
-                    scrollMeteo.setVisibility(View.GONE);
-
-                    // Richiamiamo il Manager
-                    MeteoManager.ottieniPrevisioni(requireContext(), viaggioCorrente.cittaDestinazione, viaggioCorrente.dataInizio, viaggioCorrente.dataFine, new MeteoManager.MeteoCallback() {
-
-                        @Override
-                        public void onSuccess(List<MeteoManager.Previsione> previsioni) {
-                            if (!isAdded()) return; // Protezione ciclo di vita
-
-                            textErroreMeteo.setVisibility(View.GONE);
-                            scrollMeteo.setVisibility(View.VISIBLE);
-                            contenitoreMeteo.removeAllViews();
-
-                            // Creiamo un quadratino per ogni giorno
-                            for (MeteoManager.Previsione prev : previsioni) {
-                                View itemMeteo = getLayoutInflater().inflate(R.layout.item_meteo, contenitoreMeteo, false);
-
-                                TextView textData = itemMeteo.findViewById(R.id.textDataMeteo);
-                                TextView textIcona = itemMeteo.findViewById(R.id.textIconaMeteo);
-                                TextView textTemp = itemMeteo.findViewById(R.id.textTempMeteo);
-
-                                // Inseriamo i dati (arrotondiamo i gradi per togliere i decimali)
-                                textData.setText(prev.data);
-                                textIcona.setText(prev.iconaEmoji);
-                                textTemp.setText(Math.round(prev.tempMin) + "° / " + Math.round(prev.tempMax) + "°");
-                                contenitoreMeteo.addView(itemMeteo);
-                            }
-                        }
-
-                        @Override
-                        public void onError(String errorMessage) {
-                            if (!isAdded()) return; // Protezione ciclo di vita
-
-                            scrollMeteo.setVisibility(View.GONE);
-                            textErroreMeteo.setVisibility(View.VISIBLE);
-                            textErroreMeteo.setText("🌥️\n" + errorMessage);
-                        }
-                    });
-                } else {
-                    // Se la città non è stata inserita affatto
-                    textErroreMeteo.setVisibility(View.VISIBLE);
-                    textErroreMeteo.setText("Inserisci la città di destinazione nel pannello di modifica per vedere il meteo.");
-                    scrollMeteo.setVisibility(View.GONE);
-                }
             }
         }
 
@@ -121,10 +73,16 @@ public class DettaglioViaggioFragment extends Fragment {
                                         fotoDaCancellare.delete();
                                     }
                                 }
+                                if (tappa.cloudId != null && !tappa.cloudId.isEmpty()) {
+                                    FirebaseManager.eliminaTappa(tappa.cloudId);
+                                }
                             }
                             AppDatabase.getInstance(requireContext()).viaggioDao().eliminaViaggio(viaggioCorrente);
+                            if (viaggioCorrente.cloudId != null && !viaggioCorrente.cloudId.isEmpty()) {
+                                FirebaseManager.eliminaViaggio(viaggioCorrente.cloudId);
+                            }
                             // Cancellazione notifiche "orfane"
-                            androidx.core.app.NotificationManagerCompat.from(requireContext()).cancel(viaggioCorrente.id);
+                            NotificationManagerCompat.from(requireContext()).cancel(viaggioCorrente.id);
 
                             if (!isAdded()) return; // Protezione ciclo di vita
 
@@ -149,8 +107,97 @@ public class DettaglioViaggioFragment extends Fragment {
         fabAggiungiTappa.setOnClickListener(v -> {
             Bundle bundle = new Bundle();
             bundle.putInt("id_del_viaggio", viaggioCorrente.id);
+            bundle.putString("cloud_id_viaggio", viaggioCorrente.cloudId);
             Navigation.findNavController(view).navigate(R.id.action_dettaglioViaggioFragment_to_aggiungiTappaFragment, bundle);
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (viaggioCorrente != null && contenitoreTappe != null) {
+
+            // Ricarichiamo le tappe aggiornate in tempo reale
+            caricaTappe(contenitoreTappe);
+
+            // Ricarichiamo le informazioni del viaggio (es. se abbiamo cambiato titolo o date)
+            new Thread(() -> {
+                List<Viaggio> viaggi = AppDatabase.getInstance(requireContext()).viaggioDao().ottieniViaggi();
+                for (Viaggio v : viaggi) {
+                    if (v.id == viaggioCorrente.id) {
+
+                        if (!isAdded()) return;
+
+                        requireActivity().runOnUiThread(() -> {
+                            viaggioCorrente = v; // Aggiorniamo l'oggetto "zainetto" interno
+
+                            // Aggiorniamo le scritte a schermo
+                            TextView textTitolo = requireView().findViewById(R.id.textTitoloDettaglio);
+                            TextView textDate = requireView().findViewById(R.id.textDateDettaglio);
+                            textTitolo.setText(v.titolo);
+                            textDate.setText(v.dataInizio + " - " + v.dataFine);
+                            caricaMeteo(v);
+                        });
+                        break;
+                    }
+                }
+            }).start();
+        }
+    }
+
+    // =========================================================================
+    // METODO PER CARICARE IL METEO
+    // =========================================================================
+    private void caricaMeteo(Viaggio viaggio) {
+        if (viaggio.cittaDestinazione != null && !viaggio.cittaDestinazione.trim().isEmpty()) {
+
+            // Mostriamo all'utente che stiamo caricando
+            textErroreMeteo.setVisibility(View.VISIBLE);
+            textErroreMeteo.setText("Caricamento meteo in corso...");
+            scrollMeteo.setVisibility(View.GONE);
+
+            // Richiamiamo il Manager
+            MeteoManager.ottieniPrevisioni(requireContext(), viaggio.cittaDestinazione, viaggio.dataInizio, viaggio.dataFine, new MeteoManager.MeteoCallback() {
+
+                @Override
+                public void onSuccess(List<MeteoManager.Previsione> previsioni) {
+                    if (!isAdded()) return; // Protezione ciclo di vita
+
+                    textErroreMeteo.setVisibility(View.GONE);
+                    scrollMeteo.setVisibility(View.VISIBLE);
+                    contenitoreMeteo.removeAllViews();
+
+                    // Creiamo un quadratino per ogni giorno
+                    for (MeteoManager.Previsione prev : previsioni) {
+                        View itemMeteo = getLayoutInflater().inflate(R.layout.item_meteo, contenitoreMeteo, false);
+
+                        TextView textData = itemMeteo.findViewById(R.id.textDataMeteo);
+                        TextView textIcona = itemMeteo.findViewById(R.id.textIconaMeteo);
+                        TextView textTemp = itemMeteo.findViewById(R.id.textTempMeteo);
+
+                        // Inseriamo i dati (arrotondiamo i gradi per togliere i decimali)
+                        textData.setText(prev.data);
+                        textIcona.setText(prev.iconaEmoji);
+                        textTemp.setText(Math.round(prev.tempMin) + "° / " + Math.round(prev.tempMax) + "°");
+                        contenitoreMeteo.addView(itemMeteo);
+                    }
+                }
+
+                @Override
+                public void onError(String errorMessage) {
+                    if (!isAdded()) return; // Protezione ciclo di vita
+
+                    scrollMeteo.setVisibility(View.GONE);
+                    textErroreMeteo.setVisibility(View.VISIBLE);
+                    textErroreMeteo.setText("🌥️\n" + errorMessage);
+                }
+            });
+        } else {
+            // Se la città non è stata inserita affatto
+            textErroreMeteo.setVisibility(View.VISIBLE);
+            textErroreMeteo.setText("Inserisci la città di destinazione nel pannello di modifica per vedere il meteo.");
+            scrollMeteo.setVisibility(View.GONE);
+        }
     }
 
     // =========================================================================
@@ -199,6 +246,7 @@ public class DettaglioViaggioFragment extends Fragment {
                     btnModifica.setOnClickListener(v -> {
                         Bundle bundle = new Bundle();
                         bundle.putParcelable("tappa_selezionata", tappa);
+                        bundle.putString("cloud_id_viaggio", viaggioCorrente.cloudId);
                         Navigation.findNavController(itemTappa).navigate(R.id.action_dettaglioViaggioFragment_to_modificaTappaFragment, bundle);
                     });
 
@@ -219,6 +267,7 @@ public class DettaglioViaggioFragment extends Fragment {
                                         }
                                         // Cancelliamo la tappa dal database Room
                                         AppDatabase.getInstance(requireContext()).tappaDao().eliminaTappa(tappa);
+                                        FirebaseManager.eliminaTappa(tappa.cloudId);
 
                                         if (!isAdded()) return; // Protezione ciclo di vita
 

@@ -1,4 +1,5 @@
 package com.example.triptale;
+
 import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,7 +11,6 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -21,6 +21,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import java.util.List;
 
 public class ListaViaggiFragment extends Fragment {
+    private ScrollView scrollView;
+    private LinearLayout contenitoreViaggi;
+    private TextView textEmptyState;
+    private ImageButton btnProfiloLogin;
 
     @Nullable
     @Override
@@ -33,7 +37,12 @@ public class ListaViaggiFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         FloatingActionButton fab = view.findViewById(R.id.fabAggiungiViaggio);
-        ImageButton btnProfiloLogin = view.findViewById(R.id.btnProfiloLogin);
+        btnProfiloLogin = view.findViewById(R.id.btnProfiloLogin);
+
+        // Recuperiamo i nuovi elementi della lista
+        scrollView = view.findViewById(R.id.scrollViewViaggi);
+        contenitoreViaggi = view.findViewById(R.id.contenitoreViaggi);
+        textEmptyState = view.findViewById(R.id.textEmptyState);
 
 
         // --- GESTIONE BOTTONE AGGIUNGI VIAGGIO ---
@@ -55,8 +64,18 @@ public class ListaViaggiFragment extends Fragment {
                         .setMessage("Sei loggato come:\n" + auth.getCurrentUser().getEmail() + "\n\nVuoi disconnetterti?")
                         .setPositiveButton("Logout", (dialog, which) -> {
                             auth.signOut();
-                            aggiornaColoreIcona(btnProfiloLogin);
-                            Toast.makeText(requireContext(), "Disconnesso con successo!", Toast.LENGTH_SHORT).show();
+                            new Thread(() -> {
+                                AppDatabase db = AppDatabase.getInstance(requireContext());
+                                db.viaggioDao().eliminaViaggi();
+
+                                if (!isAdded()) return;
+
+                                requireActivity().runOnUiThread(() -> {
+                                    aggiornaColoreIcona(btnProfiloLogin);
+                                    Toast.makeText(requireContext(), "Disconnesso con successo!", Toast.LENGTH_SHORT).show();
+                                    caricaViaggiDalDatabase();
+                                });
+                            }).start();
                         })
                         .setNegativeButton("Annulla", null)
                         .show();
@@ -65,12 +84,23 @@ public class ListaViaggiFragment extends Fragment {
                 Navigation.findNavController(view).navigate(R.id.action_listaViaggiFragment_to_loginFragment);
             }
         });
+    }
 
-        // Recuperiamo i nuovi elementi della lista
-        ScrollView scrollView = view.findViewById(R.id.scrollViewViaggi);
-        LinearLayout contenitoreViaggi = view.findViewById(R.id.contenitoreViaggi);
-        TextView textEmptyState = view.findViewById(R.id.textEmptyState);
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (getView() != null) {
+            if (btnProfiloLogin != null) {
+                aggiornaColoreIcona(btnProfiloLogin);
+            }
+            caricaViaggiDalDatabase();
+        }
+    }
 
+    // =====================================================================
+    // METODO PER CARICARE I VIAGGI
+    // =====================================================================
+    private void caricaViaggiDalDatabase() {
         // Thread per recuperare i viaggi dal database
         new Thread(() -> {
             // Apriamo il Database e richiediamo la lista dei viaggi
@@ -127,16 +157,6 @@ public class ListaViaggiFragment extends Fragment {
                 }
             });
         }).start();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        // Quando torniamo dalla schermata di login, aggiorniamo il colore
-        if (getView() != null) {
-            ImageButton btnProfiloLogin = getView().findViewById(R.id.btnProfiloLogin);
-            aggiornaColoreIcona(btnProfiloLogin);
-        }
     }
 
     // =====================================================================

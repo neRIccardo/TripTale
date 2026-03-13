@@ -21,6 +21,8 @@ public class Tappa implements Parcelable {
     public String titolo;
     public String note;
     public String imagePath;
+    public String cloudId; // Collegamento tra Room e Firebase
+
 
     // Per definire una nuova Tappa
     public Tappa(int viaggioId, String titolo, String note) {
@@ -40,6 +42,7 @@ public class Tappa implements Parcelable {
         titolo = in.readString();
         note = in.readString();
         imagePath = in.readString();
+        cloudId = in.readString();
     }
 
     // "Creator" che Android usa per ricostruire l'oggetto
@@ -68,5 +71,6 @@ public class Tappa implements Parcelable {
         dest.writeString(titolo);
         dest.writeString(note);
         dest.writeString(imagePath);
+        dest.writeString(cloudId);
     }
 }

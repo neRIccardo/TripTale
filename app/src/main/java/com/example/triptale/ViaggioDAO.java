@@ -11,7 +11,7 @@ public interface ViaggioDAO {
 
     // Comando per SALVARE un nuovo viaggio
     @Insert
-    void inserisciViaggio(Viaggio viaggio);
+    long inserisciViaggio(Viaggio viaggio);
 
     @Update
     void aggiornaViaggio(Viaggio viaggio);
@@ -19,6 +19,10 @@ public interface ViaggioDAO {
     // Comando per LEGGERE tutti i viaggi salvati
     @Query("SELECT * FROM tabella_viaggi")
     List<Viaggio> ottieniViaggi();
+
+    // Comando per cancellare tutti i viaggi
+    @Query("DELETE FROM tabella_viaggi")
+    void eliminaViaggi();
 
     // Comando per CANCELLARE un viaggio
     @Delete

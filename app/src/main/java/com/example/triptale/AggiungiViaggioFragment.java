@@ -98,7 +98,9 @@ public class AggiungiViaggioFragment extends Fragment {
                     AppDatabase db = AppDatabase.getInstance(requireContext());
 
                     // Inseriamo il viaggio
-                    db.viaggioDao().inserisciViaggio(nuovoViaggio);
+                    long idGenerato = db.viaggioDao().inserisciViaggio(nuovoViaggio);
+                    nuovoViaggio.id = (int) idGenerato;
+                    FirebaseManager.aggiungiViaggio(requireContext(), nuovoViaggio);
 
                     if (!isAdded()) return;
 

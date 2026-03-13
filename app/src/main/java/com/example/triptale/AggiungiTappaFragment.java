@@ -29,6 +29,7 @@ public class AggiungiTappaFragment extends Fragment {
     private Uri uriFotoTemporanea = null;
     private String percorsoNuovaFotoTemp = null; // Il file da 0 byte in attesa
     private boolean salvataggioCompletato = false;
+    private String cloudIdViaggioCorrente = null;
 
     @Nullable
     @Override
@@ -43,6 +44,7 @@ public class AggiungiTappaFragment extends Fragment {
         // Recuperiamo l'id del viaggio dal bundle
         if (getArguments() != null) {
             idViaggioCorrente = getArguments().getInt("id_del_viaggio", -1);
+            cloudIdViaggioCorrente = getArguments().getString("cloud_id_viaggio", null);
         }
         // Controllo di sicurezza
         if (idViaggioCorrente == -1) {
@@ -95,7 +97,9 @@ public class AggiungiTappaFragment extends Fragment {
             Tappa nuovaTappa = new Tappa(idViaggioCorrente, titoloInserito, noteInserite);
             nuovaTappa.imagePath = percorsoFotoAttuale;
             new Thread(() -> {
-                AppDatabase.getInstance(requireContext()).tappaDao().inserisciTappa(nuovaTappa);
+                long idGenerato = AppDatabase.getInstance(requireContext()).tappaDao().inserisciTappa(nuovaTappa);
+                nuovaTappa.id = (int) idGenerato;
+                FirebaseManager.aggiungiTappa(requireContext(), nuovaTappa, cloudIdViaggioCorrente);
 
                 if (!isAdded()) return;
 

@@ -23,6 +23,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class ModificaViaggioFragment extends Fragment {
@@ -164,7 +165,25 @@ public class ModificaViaggioFragment extends Fragment {
 
             // Salviamo nel DB usando un Thread
             new Thread(() -> {
-                AppDatabase.getInstance(requireContext()).viaggioDao().aggiornaViaggio(viaggioCorrente);
+                AppDatabase db = AppDatabase.getInstance(requireContext());
+                List<Viaggio> viaggiAggiornati = db.viaggioDao().ottieniViaggi();
+                for (Viaggio viaggio : viaggiAggiornati) {
+                    if (viaggio.id == viaggioCorrente.id) {
+                        viaggioCorrente.cloudId = viaggio.cloudId;
+                        break;
+                    }
+                }
+                db.viaggioDao().aggiornaViaggio(viaggioCorrente);
+
+                // Aggiorniamo Firebase
+                if (viaggioCorrente.cloudId != null && !viaggioCorrente.cloudId.isEmpty()) {
+                    FirebaseManager.aggiornaViaggio(viaggioCorrente);
+                } else {
+                    com.google.firebase.auth.FirebaseUser user = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
+                    if (user != null) {
+                        FirebaseManager.sincronizzaTutto(requireContext(), user.getUid(), null);
+                    }
+                }
 
                 if (!isAdded()) return;
 

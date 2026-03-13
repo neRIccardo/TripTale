@@ -9,7 +9,7 @@ import java.util.List;
 @Dao
 public interface TappaDAO {
     @Insert
-    void inserisciTappa(Tappa tappa);
+    long inserisciTappa(Tappa tappa);
 
     @Update
     void aggiornaTappa(Tappa tappa);

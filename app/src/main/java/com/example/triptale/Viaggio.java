@@ -19,6 +19,7 @@ public class Viaggio implements Parcelable {
     public String dataInizio;
     public String dataFine;
     public String imagePath;
+    public String cloudId; // Collegamento tra Room e Firebase
 
     // Per definire un nuovo viaggio
     public Viaggio(String titolo, String cittaDestinazione, String dataInizio, String dataFine) {
@@ -40,6 +41,7 @@ public class Viaggio implements Parcelable {
         dataInizio = in.readString();
         dataFine = in.readString();
         imagePath = in.readString();
+        cloudId = in.readString();
     }
 
     // "Creator" che Android usa per ricostruire l'oggetto
@@ -69,5 +71,6 @@ public class Viaggio implements Parcelable {
         dest.writeString(dataInizio);
         dest.writeString(dataFine);
         dest.writeString(imagePath);
+        dest.writeString(cloudId);
     }
 }

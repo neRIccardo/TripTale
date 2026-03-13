@@ -16,10 +16,15 @@ import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class ModificaTappaFragment extends Fragment {
@@ -30,6 +35,8 @@ public class ModificaTappaFragment extends Fragment {
     private Uri uriFotoTemporanea = null;
     private String percorsoNuovaFotoTemp = null; // Il file da 0 byte in attesa
     private boolean salvataggioCompletato = false; // Ci dice se l'utente ha premuto "Salva"
+    private String cloudIdViaggioCorrente = null;
+
 
     @Nullable
     @Override
@@ -49,6 +56,9 @@ public class ModificaTappaFragment extends Fragment {
 
         if (getArguments() != null) {
             tappaCorrente = getArguments().getParcelable("tappa_selezionata");
+            cloudIdViaggioCorrente = getArguments().getString("cloud_id_viaggio", null);
+
+
             if (tappaCorrente != null) {
                 editTitolo.setText(tappaCorrente.titolo);
                 editNote.setText(tappaCorrente.note);
@@ -64,7 +74,7 @@ public class ModificaTappaFragment extends Fragment {
             }
         }
 
-        //--- GESTIONE BOTTONE SCATTO FOTO ---
+        // --- GESTIONE BOTTONE SCATTO FOTO ---
         btnScatta.setOnClickListener(v -> {
             try {
                 File fileImmagine = creaFileImmagine();
@@ -102,7 +112,26 @@ public class ModificaTappaFragment extends Fragment {
 
             // Aggiorniamo il Database
             new Thread(() -> {
-                AppDatabase.getInstance(requireContext()).tappaDao().aggiornaTappa(tappaCorrente);
+                AppDatabase db = AppDatabase.getInstance(requireContext());
+
+                List<Tappa> tappeAggiornate = db.tappaDao().ottieniTappeDelViaggio(tappaCorrente.viaggioId);
+                for (Tappa t : tappeAggiornate) {
+                    if (t.id == tappaCorrente.id) {
+                        tappaCorrente.cloudId = t.cloudId;
+                        break;
+                    }
+                }
+
+                db.tappaDao().aggiornaTappa(tappaCorrente);
+
+                if (tappaCorrente.cloudId != null && !tappaCorrente.cloudId.isEmpty()) {
+                    FirebaseManager.aggiornaTappa(tappaCorrente, cloudIdViaggioCorrente);
+                } else {
+                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                    if (user != null) {
+                        FirebaseManager.sincronizzaTutto(requireContext(), user.getUid(), null);
+                    }
+                }
 
                 if (!isAdded()) return;
 
