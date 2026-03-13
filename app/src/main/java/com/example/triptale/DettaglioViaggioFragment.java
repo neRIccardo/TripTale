@@ -256,39 +256,34 @@ public class DettaglioViaggioFragment extends Fragment {
                     });
 
                     // --- GESTIONE BOTTONE ELIMINA TAPPA ---
-                    btnElimina.setOnClickListener(v -> {
-                        new AlertDialog.Builder(requireContext())
-                                .setTitle(R.string.titolo_elimina_tappa)
-                                .setMessage(R.string.msg_elimina_tappa)
-                                .setPositiveButton(R.string.elimina, (dialog, which) -> {
+                    btnElimina.setOnClickListener(v -> new AlertDialog.Builder(requireContext())
+                            .setTitle(R.string.titolo_elimina_tappa)
+                            .setMessage(R.string.msg_elimina_tappa)
+                            .setPositiveButton(R.string.elimina, (dialog, which) -> new Thread(() -> {
+                                // Cancelliamo l'eventuale foto della tappa dalla memoria
+                                if (tappa.imagePath != null) {
+                                    File fotoDaCancellare = new File(tappa.imagePath);
+                                    if (fotoDaCancellare.exists()) {
+                                        fotoDaCancellare.delete();
+                                    }
+                                }
+                                // Cancelliamo la tappa dal database Room
+                                AppDatabase.getInstance(requireContext()).tappaDao().eliminaTappa(tappa);
+                                if (tappa.cloudId != null && !tappa.cloudId.isEmpty()) {
+                                    FirebaseManager.eliminaTappa(tappa.cloudId);
+                                }
 
-                                    new Thread(() -> {
-                                        // Cancelliamo l'eventuale foto della tappa dalla memoria
-                                        if (tappa.imagePath != null) {
-                                            File fotoDaCancellare = new File(tappa.imagePath);
-                                            if (fotoDaCancellare.exists()) {
-                                                fotoDaCancellare.delete();
-                                            }
-                                        }
-                                        // Cancelliamo la tappa dal database Room
-                                        AppDatabase.getInstance(requireContext()).tappaDao().eliminaTappa(tappa);
-                                        if (tappa.cloudId != null && !tappa.cloudId.isEmpty()) {
-                                            FirebaseManager.eliminaTappa(tappa.cloudId);
-                                        }
+                                if (!isAdded()) return; // Protezione ciclo di vita
 
-                                        if (!isAdded()) return; // Protezione ciclo di vita
-
-                                        // Aggiorniamo la grafica
-                                        requireActivity().runOnUiThread(() -> {
-                                            Toast.makeText(requireContext(), R.string.tappa_eliminata, Toast.LENGTH_SHORT).show();
-                                            // Rigeneriamo la lista di item
-                                            caricaTappe(contenitore);
-                                        });
-                                    }).start();
-                                })
-                                .setNegativeButton(R.string.annulla, null) // Chiude il pop-up
-                                .show();
-                    });
+                                // Aggiorniamo la grafica
+                                requireActivity().runOnUiThread(() -> {
+                                    Toast.makeText(requireContext(), R.string.tappa_eliminata, Toast.LENGTH_SHORT).show();
+                                    // Rigeneriamo la lista di item
+                                    caricaTappe(contenitore);
+                                });
+                            }).start())
+                            .setNegativeButton(R.string.annulla, null) // Chiude il pop-up
+                            .show());
                     // Attacchiamo la tappa completa allo schermo
                     contenitore.addView(itemTappa);
                 }

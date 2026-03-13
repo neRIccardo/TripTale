@@ -233,13 +233,11 @@ public class FirebaseManager {
         // Salviamo le tappe in una collezione separata chiamata "tappe"
         db.collection("utenti").document(user.getUid()).collection("tappe")
                 .add(tappaMap)
-                .addOnSuccessListener(documentReference -> {
-                    new Thread(() -> {
-                        tappa.cloudId = documentReference.getId();
-                        // Aggiorniamo la tappa nel DB locale con il suo nuovo cloudId
-                        AppDatabase.getInstance(context).tappaDao().aggiornaTappa(tappa);
-                    }).start();
-                });
+                .addOnSuccessListener(documentReference -> new Thread(() -> {
+                    tappa.cloudId = documentReference.getId();
+                    // Aggiorniamo la tappa nel DB locale con il suo nuovo cloudId
+                    AppDatabase.getInstance(context).tappaDao().aggiornaTappa(tappa);
+                }).start());
     }
 
     // ========================================================================================
