@@ -1,4 +1,5 @@
 package com.example.triptale;
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +16,8 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.io.File;
 import java.util.List;
 
 public class DettaglioViaggioFragment extends Fragment {
@@ -51,24 +54,25 @@ public class DettaglioViaggioFragment extends Fragment {
             if (viaggioCorrente != null) {
                 // Popoliamo l'interfaccia
                 textTitolo.setText(viaggioCorrente.titolo);
-                textDate.setText(viaggioCorrente.dataInizio + " - " + viaggioCorrente.dataFine);
+                String testoData = viaggioCorrente.dataInizio + getString(R.string.trattino) + viaggioCorrente.dataFine;
+                textDate.setText(testoData);
             }
         }
 
         // --- GESTIONE BOTTONE ELIMINA VIAGGIO ---
         btnElimina.setOnClickListener(v -> {
             // Creiamo la finestra di dialogo (il pop-up)
-            new android.app.AlertDialog.Builder(requireContext())
-                    .setTitle("Elimina Viaggio")
-                    .setMessage("Sei sicuro di voler eliminare questo viaggio e tutte le sue tappe?\nL'azione è irreversibile.")
-                    .setPositiveButton("Elimina", (dialog, which) -> {
+            new AlertDialog.Builder(requireContext())
+                    .setTitle(R.string.elimina_viaggio)
+                    .setMessage(R.string.msg_elimina_viaggio)
+                    .setPositiveButton(R.string.elimina, (dialog, which) -> {
                         // Se l'utente clicca "Elimina", facciamo partire il Thread di eliminazione
                         new Thread(() -> {
                             List <Tappa> tappeDelViaggio = AppDatabase.getInstance(requireContext()).tappaDao().ottieniTappeDelViaggio(viaggioCorrente.id);
                             for(Tappa tappa : tappeDelViaggio) {
                                 // Cancelliamo l'eventuale foto della tappa dalla memoria
                                 if (tappa.imagePath != null) {
-                                    java.io.File fotoDaCancellare = new java.io.File(tappa.imagePath);
+                                    File fotoDaCancellare = new File(tappa.imagePath);
                                     if (fotoDaCancellare.exists()) {
                                         fotoDaCancellare.delete();
                                     }
@@ -87,12 +91,12 @@ public class DettaglioViaggioFragment extends Fragment {
                             if (!isAdded()) return; // Protezione ciclo di vita
 
                             requireActivity().runOnUiThread(() -> {
-                                Toast.makeText(requireContext(), "Viaggio eliminato!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(requireContext(), R.string.viaggio_eliminato, Toast.LENGTH_SHORT).show();
                                 Navigation.findNavController(view).popBackStack();
                             });
                         }).start();
                     })
-                    .setNegativeButton("Annulla", null) // Se clicca annulla, la finestra si chiude da sola
+                    .setNegativeButton(R.string.annulla, null) // Se clicca annulla, la finestra si chiude da sola
                     .show(); // Mostriamo la finestra a schermo
         });
 
@@ -135,7 +139,8 @@ public class DettaglioViaggioFragment extends Fragment {
                             TextView textTitolo = requireView().findViewById(R.id.textTitoloDettaglio);
                             TextView textDate = requireView().findViewById(R.id.textDateDettaglio);
                             textTitolo.setText(v.titolo);
-                            textDate.setText(v.dataInizio + " - " + v.dataFine);
+                            String testoData = v.dataInizio + getString(R.string.trattino) + v.dataFine;
+                            textDate.setText(testoData);
                             caricaMeteo(v);
                         });
                         break;
@@ -153,7 +158,7 @@ public class DettaglioViaggioFragment extends Fragment {
 
             // Mostriamo all'utente che stiamo caricando
             textErroreMeteo.setVisibility(View.VISIBLE);
-            textErroreMeteo.setText("Caricamento meteo in corso...");
+            textErroreMeteo.setText(R.string.meteo_caricamento);
             scrollMeteo.setVisibility(View.GONE);
 
             // Richiamiamo il Manager
@@ -178,7 +183,7 @@ public class DettaglioViaggioFragment extends Fragment {
                         // Inseriamo i dati (arrotondiamo i gradi per togliere i decimali)
                         textData.setText(prev.data);
                         textIcona.setText(prev.iconaEmoji);
-                        textTemp.setText(Math.round(prev.tempMin) + "° / " + Math.round(prev.tempMax) + "°");
+                        textTemp.setText(getString(R.string.formato_temperatura, Math.round(prev.tempMin), Math.round(prev.tempMax)));
                         contenitoreMeteo.addView(itemMeteo);
                     }
                 }
@@ -189,13 +194,13 @@ public class DettaglioViaggioFragment extends Fragment {
 
                     scrollMeteo.setVisibility(View.GONE);
                     textErroreMeteo.setVisibility(View.VISIBLE);
-                    textErroreMeteo.setText("🌥️\n" + errorMessage);
+                    textErroreMeteo.setText(getString(R.string.errore_meteo_prefisso, errorMessage));
                 }
             });
         } else {
             // Se la città non è stata inserita affatto
             textErroreMeteo.setVisibility(View.VISIBLE);
-            textErroreMeteo.setText("Inserisci la città di destinazione nel pannello di modifica per vedere il meteo.");
+            textErroreMeteo.setText(R.string.meteo_citta_mancante);
             scrollMeteo.setVisibility(View.GONE);
         }
     }
@@ -252,34 +257,36 @@ public class DettaglioViaggioFragment extends Fragment {
 
                     // --- GESTIONE BOTTONE ELIMINA TAPPA ---
                     btnElimina.setOnClickListener(v -> {
-                        new android.app.AlertDialog.Builder(requireContext())
-                                .setTitle("Elimina Tappa")
-                                .setMessage("Sei sicuro di voler eliminare questa tappa?\nL'azione è irreversibile.")
-                                .setPositiveButton("Elimina", (dialog, which) -> {
+                        new AlertDialog.Builder(requireContext())
+                                .setTitle(R.string.titolo_elimina_tappa)
+                                .setMessage(R.string.msg_elimina_tappa)
+                                .setPositiveButton(R.string.elimina, (dialog, which) -> {
 
                                     new Thread(() -> {
                                         // Cancelliamo l'eventuale foto della tappa dalla memoria
                                         if (tappa.imagePath != null) {
-                                            java.io.File fotoDaCancellare = new java.io.File(tappa.imagePath);
+                                            File fotoDaCancellare = new File(tappa.imagePath);
                                             if (fotoDaCancellare.exists()) {
                                                 fotoDaCancellare.delete();
                                             }
                                         }
                                         // Cancelliamo la tappa dal database Room
                                         AppDatabase.getInstance(requireContext()).tappaDao().eliminaTappa(tappa);
-                                        FirebaseManager.eliminaTappa(tappa.cloudId);
+                                        if (tappa.cloudId != null && !tappa.cloudId.isEmpty()) {
+                                            FirebaseManager.eliminaTappa(tappa.cloudId);
+                                        }
 
                                         if (!isAdded()) return; // Protezione ciclo di vita
 
                                         // Aggiorniamo la grafica
                                         requireActivity().runOnUiThread(() -> {
-                                            Toast.makeText(requireContext(), "Tappa eliminata!", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(requireContext(), R.string.tappa_eliminata, Toast.LENGTH_SHORT).show();
                                             // Rigeneriamo la lista di item
                                             caricaTappe(contenitore);
                                         });
                                     }).start();
                                 })
-                                .setNegativeButton("Annulla", null) // Chiude il pop-up
+                                .setNegativeButton(R.string.annulla, null) // Chiude il pop-up
                                 .show();
                     });
                     // Attacchiamo la tappa completa allo schermo

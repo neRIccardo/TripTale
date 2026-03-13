@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -19,6 +18,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -126,18 +127,18 @@ public class ModificaViaggioFragment extends Fragment {
             editDataFine.setError(null);
 
             if (titolo.isEmpty()) {
-                editTitolo.setError("Inserisci il titolo del viaggio!");
+                editTitolo.setError(getString(R.string.errore_titolo_viaggio));
                 editTitolo.requestFocus();
                 return;
             }
             if (dataInizio.isEmpty()) {
-                editDataInizio.setError("Errore");
-                Toast.makeText(requireContext(), "Seleziona la data di partenza!", Toast.LENGTH_SHORT).show();
+                editDataInizio.setError(getString(R.string.errore_generico));
+                Toast.makeText(requireContext(), R.string.errore_data_partenza, Toast.LENGTH_SHORT).show();
                 return;
             }
             if (dataFine.isEmpty()) {
-                editDataFine.setError("Errore");
-                Toast.makeText(requireContext(), "Seleziona la data di ritorno!", Toast.LENGTH_SHORT).show();
+                editDataFine.setError(getString(R.string.errore_generico));
+                Toast.makeText(requireContext(), R.string.errore_data_ritorno, Toast.LENGTH_SHORT).show();
                 return;
             }
             // Controllo logico delle date (L'inizio non può essere dopo la fine)
@@ -148,8 +149,8 @@ public class ModificaViaggioFragment extends Fragment {
 
                 // Se la data di partenza è successiva a quella di ritorno...
                 if (dataPartenza != null && dataRitorno != null && dataPartenza.after(dataRitorno)) {
-                    editDataFine.setError("Errore");
-                    Toast.makeText(requireContext(), "La data di fine non può precedere l'inizio!", Toast.LENGTH_LONG).show();
+                    editDataFine.setError(getString(R.string.errore_generico));
+                    Toast.makeText(requireContext(), R.string.errore_date_incongruenti, Toast.LENGTH_LONG).show();
                     return; // Blocchiamo il salvataggio
                 }
             } catch (ParseException e) {
@@ -179,7 +180,7 @@ public class ModificaViaggioFragment extends Fragment {
                 if (viaggioCorrente.cloudId != null && !viaggioCorrente.cloudId.isEmpty()) {
                     FirebaseManager.aggiornaViaggio(viaggioCorrente);
                 } else {
-                    com.google.firebase.auth.FirebaseUser user = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
+                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                     if (user != null) {
                         FirebaseManager.sincronizzaTutto(requireContext(), user.getUid(), null);
                     }
@@ -188,7 +189,7 @@ public class ModificaViaggioFragment extends Fragment {
                 if (!isAdded()) return;
 
                 requireActivity().runOnUiThread(() -> {
-                    Toast.makeText(requireContext(), "Viaggio modificato!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), R.string.viaggio_modificato, Toast.LENGTH_SHORT).show();
                     Navigation.findNavController(view).popBackStack();
                 });
             }).start();
@@ -204,13 +205,10 @@ public class ModificaViaggioFragment extends Fragment {
         int mese = calendario.get(Calendar.MONTH);
         int giorno = calendario.get(Calendar.DAY_OF_MONTH);
 
-        DatePickerDialog dialog = new DatePickerDialog(requireContext(), new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                String dataScelta = String.format(Locale.getDefault(), "%02d/%02d/%04d", dayOfMonth, (month + 1), year);
-                casellaDaRiempire.setText(dataScelta);
-                casellaDaRiempire.setError(null);
-            }
+        DatePickerDialog dialog = new DatePickerDialog(requireContext(), (view, year, month, dayOfMonth) -> {
+            String dataScelta = String.format(Locale.getDefault(), "%02d/%02d/%04d", dayOfMonth, (month + 1), year);
+            casellaDaRiempire.setText(dataScelta);
+            casellaDaRiempire.setError(null);
         }, anno, mese, giorno);
         dialog.show();
     }

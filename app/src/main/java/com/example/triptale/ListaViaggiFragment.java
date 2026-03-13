@@ -1,5 +1,4 @@
 package com.example.triptale;
-
 import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -44,14 +43,8 @@ public class ListaViaggiFragment extends Fragment {
         contenitoreViaggi = view.findViewById(R.id.contenitoreViaggi);
         textEmptyState = view.findViewById(R.id.textEmptyState);
 
-
         // --- GESTIONE BOTTONE AGGIUNGI VIAGGIO ---
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Navigation.findNavController(view).navigate(R.id.action_listaViaggiFragment_to_aggiungiViaggioFragment);
-            }
-        });
+        fab.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.action_listaViaggiFragment_to_aggiungiViaggioFragment));
 
         // --- GESTIONE BOTTONE PROFILO / LOGIN ---
         btnProfiloLogin.setOnClickListener(v -> {
@@ -60,9 +53,9 @@ public class ListaViaggiFragment extends Fragment {
             if (auth.getCurrentUser() != null) {
                 // Mostriamo il popup di logout se l'utente è loggato
                 new AlertDialog.Builder(requireContext())
-                        .setTitle("Gestione account")
-                        .setMessage("Sei loggato come:\n" + auth.getCurrentUser().getEmail() + "\n\nVuoi disconnetterti?")
-                        .setPositiveButton("Logout", (dialog, which) -> {
+                        .setTitle(R.string.gestione_account)
+                        .setMessage(getString(R.string.msg_logout, auth.getCurrentUser().getEmail()))
+                        .setPositiveButton(R.string.logout, (dialog, which) -> {
                             auth.signOut();
                             new Thread(() -> {
                                 AppDatabase db = AppDatabase.getInstance(requireContext());
@@ -72,12 +65,12 @@ public class ListaViaggiFragment extends Fragment {
 
                                 requireActivity().runOnUiThread(() -> {
                                     aggiornaColoreIcona(btnProfiloLogin);
-                                    Toast.makeText(requireContext(), "Disconnesso con successo!", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(requireContext(), R.string.logout_successo, Toast.LENGTH_SHORT).show();
                                     caricaViaggiDalDatabase();
                                 });
                             }).start();
                         })
-                        .setNegativeButton("Annulla", null)
+                        .setNegativeButton(R.string.annulla, null)
                         .show();
             } else {
                 // Andiamo alla schermata di login se l'utente non è loggato
@@ -127,7 +120,10 @@ public class ListaViaggiFragment extends Fragment {
                         TextView textTitolo = itemViaggio.findViewById(R.id.textTitoloViaggio);
                         TextView textDate = itemViaggio.findViewById(R.id.textDateViaggio);
                         textTitolo.setText(viaggio.titolo);
-                        textDate.setText(viaggio.dataInizio + " - " + viaggio.dataFine);
+
+                        String testoData = viaggio.dataInizio + getString(R.string.trattino) + viaggio.dataFine;
+                        textDate.setText(testoData);
+
                         ImageView imageCopertina = itemViaggio.findViewById(R.id.imageCopertina);
 
                         if (viaggio.imagePath != null) {
@@ -163,7 +159,7 @@ public class ListaViaggiFragment extends Fragment {
     // METODO PER AGGIORNARE IL COLORE DELL'ICONA DEL PROFILO
     // =====================================================================
     private void aggiornaColoreIcona(ImageButton btnProfilo) {
-        com.google.firebase.auth.FirebaseAuth auth = com.google.firebase.auth.FirebaseAuth.getInstance();
+        FirebaseAuth auth = FirebaseAuth.getInstance();
 
         if (auth.getCurrentUser() != null) {
             // UTENTE LOGGATO: coloriamo l'icona di Verde

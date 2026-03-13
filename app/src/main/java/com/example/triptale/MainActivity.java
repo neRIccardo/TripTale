@@ -2,6 +2,9 @@ package com.example.triptale;
 import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -42,8 +45,8 @@ public class MainActivity extends AppCompatActivity {
         // I canali servono solo da Android Oreo (API 26) in poi
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             String idCanale = "CANALE_VIAGGI";
-            String nomeCanale = "Promemoria e meteo viaggi";
-            String descrizione = "Avvisi sulle partenze imminenti e il meteo giornaliero";
+            String nomeCanale = getString(R.string.canale_meteo_nome);
+            String descrizione = getString(R.string.canale_meteo_descrizione);
 
             // IMPORTANCE_HIGH serve per far apparire il "fumetto" a comparsa in cima allo schermo
             int importanza = NotificationManager.IMPORTANCE_HIGH;
@@ -79,12 +82,12 @@ public class MainActivity extends AppCompatActivity {
     // PROGRAMMAZIONE DEL CONTROLLO GIORNALIERO (Ogni 24 ore in background)
     // =========================================================================
     private void programmaControlloGiornaliero() {
-        android.app.job.JobScheduler jobScheduler = (android.app.job.JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
+        JobScheduler jobScheduler = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
         if (jobScheduler == null) return;
 
         // Controlliamo se il lavoro con ID 1001 è già stato programmato
         boolean giaProgrammato = false;
-        for (android.app.job.JobInfo jobInfo : jobScheduler.getAllPendingJobs()) {
+        for (JobInfo jobInfo : jobScheduler.getAllPendingJobs()) {
             if (jobInfo.getId() == 1001) {
                 giaProgrammato = true;
                 break;
@@ -97,8 +100,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Se invece non esiste (es. la prima volta che apriamo l'app), lo creiamo
-        android.content.ComponentName serviceComponent = new android.content.ComponentName(this, MeteoJobService.class);
-        android.app.job.JobInfo.Builder builder = new android.app.job.JobInfo.Builder(1001, serviceComponent);
+        ComponentName serviceComponent = new ComponentName(this, MeteoJobService.class);
+        JobInfo.Builder builder = new JobInfo.Builder(1001, serviceComponent);
 
         // Esegui ogni 15 minuti (il minimo consentito da Android)
         builder.setPeriodic(15 * 60 * 1000L);

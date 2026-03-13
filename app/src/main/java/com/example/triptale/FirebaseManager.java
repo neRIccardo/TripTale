@@ -1,11 +1,10 @@
 package com.example.triptale;
 import android.content.Context;
 import android.util.Log;
-
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -39,7 +38,7 @@ public class FirebaseManager {
                         viaggioMap.put("imagePath", viaggio.imagePath);
 
                         // Usiamo Tasks.await() per bloccare il Thread finché Firebase non risponde
-                        com.google.firebase.firestore.DocumentReference docRef = com.google.android.gms.tasks.Tasks.await(
+                        DocumentReference docRef = Tasks.await(
                                 db.collection("utenti").document(userId).collection("viaggi").add(viaggioMap)
                         );
                         // Salviamo il nuovo ID generato dal cloud nel nostro database locale
@@ -60,7 +59,7 @@ public class FirebaseManager {
                                 tappaMap.put("note", tappa.note);
                                 tappaMap.put("imagePath", tappa.imagePath);
 
-                                com.google.firebase.firestore.DocumentReference docRefTappa = com.google.android.gms.tasks.Tasks.await(
+                                DocumentReference docRefTappa = Tasks.await(
                                         db.collection("utenti").document(userId).collection("tappe").add(tappaMap)
                                 );
                                 tappa.cloudId = docRefTappa.getId();

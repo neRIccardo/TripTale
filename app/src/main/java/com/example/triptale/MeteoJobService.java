@@ -1,11 +1,16 @@
 package com.example.triptale;
+import android.Manifest;
 import android.app.PendingIntent;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
 import android.content.pm.PackageManager;
+import android.os.Bundle;
+
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
+import androidx.navigation.NavDeepLinkBuilder;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -45,7 +50,9 @@ public class MeteoJobService extends JobService {
                             (calOggi.getTime().equals(dataFine) || calOggi.getTime().before(dataFine));
 
                     if (parteDomani || inCorso) {
-                        String tipoAvviso = parteDomani ? "Domani avrà inizio il viaggio " : "Goditi il viaggio ";
+                        String tipoAvviso = parteDomani ?
+                                getString(R.string.avviso_partenza_domani, v.titolo) :
+                                getString(R.string.avviso_viaggio_in_corso, v.titolo);
 
                         // Semaforo per dire al Worker di aspettare la risposta di Volley prima di spegnersi
                         CountDownLatch latch = new CountDownLatch(1);
@@ -57,21 +64,21 @@ public class MeteoJobService extends JobService {
                                 if (!previsioni.isEmpty()) {
                                     if(parteDomani) {
                                         // Prendiamo la previsione per domani
-                                        meteoTesto = "\nMeteo di domani:  " + previsioni.get(0).iconaEmoji + " " + Math.round(previsioni.get(0).tempMin) + "/" + Math.round(previsioni.get(0).tempMax) + "°C";
+                                        meteoTesto = getString(R.string.meteo_domani, previsioni.get(0).iconaEmoji, Math.round(previsioni.get(0).tempMin), Math.round(previsioni.get(0).tempMax));
                                     }
                                     else {
                                         // Prendiamo la previsione di oggi
-                                        meteoTesto = "\nMeteo di oggi:  " + previsioni.get(0).iconaEmoji + " " + Math.round(previsioni.get(0).tempMin) + "/" + Math.round(previsioni.get(0).tempMax) + "°C";
+                                        meteoTesto = getString(R.string.meteo_oggi, previsioni.get(0).iconaEmoji, Math.round(previsioni.get(0).tempMin), Math.round(previsioni.get(0).tempMax));
                                     }
                                 }
-                                inviaNotifica(v, tipoAvviso + "\"" + v.titolo + "\"!" + meteoTesto);
+                                inviaNotifica(v, tipoAvviso + meteoTesto);
                                 latch.countDown(); // Diamo il semaforo verde per proseguire
                             }
 
                             @Override
                             public void onError(String errorMessage) {
                                 // Se manca internet o c'è un errore, mandiamo la notifica senza meteo
-                                inviaNotifica(v, tipoAvviso + "\"" + v.titolo + "\"!\n(Meteo non disponibile)");
+                                inviaNotifica(v, tipoAvviso + getString(R.string.meteo_non_disponibile));
                                 latch.countDown(); // Diamo il semaforo verde per proseguire
                             }
                         });
@@ -102,15 +109,15 @@ public class MeteoJobService extends JobService {
     // =========================================================================
     private void inviaNotifica(Viaggio viaggio, String testoDellaNotifica) {
         // Controlliamo per sicurezza di avere i permessi
-        if (ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
 
         // Se l'utente clicca la notifica, apriamo l'app
-        android.os.Bundle bundle = new android.os.Bundle();
+        Bundle bundle = new Bundle();
         bundle.putParcelable("viaggio_selezionato", viaggio);
 
-        PendingIntent pendingIntent = new androidx.navigation.NavDeepLinkBuilder(getApplicationContext())
+        PendingIntent pendingIntent = new NavDeepLinkBuilder(getApplicationContext())
                 .setGraph(R.navigation.nav_graph)
                 .setDestination(R.id.dettaglioViaggioFragment)
                 .setArguments(bundle)
@@ -119,7 +126,7 @@ public class MeteoJobService extends JobService {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), "CANALE_VIAGGI")
                 .setSmallIcon(android.R.drawable.ic_dialog_map) // Sostituisci se hai un'altra icona
                 .setCategory(NotificationCompat.CATEGORY_REMINDER)
-                .setContentTitle("TripTale ✈️")
+                .setContentTitle(getString(R.string.app_name_notifica))
                 .setContentText(testoDellaNotifica)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true) // La notifica sparisce se ci clicchi

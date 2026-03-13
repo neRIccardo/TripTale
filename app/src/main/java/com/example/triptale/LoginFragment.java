@@ -11,8 +11,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
-
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthInvalidUserException;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 
 public class LoginFragment extends Fragment {
     private FirebaseAuth mAuth;
@@ -44,12 +47,12 @@ public class LoginFragment extends Fragment {
             textErrore.setVisibility(View.GONE);
 
             if (email.isEmpty()){
-                editEmail.setError("Inserisci email");
+                editEmail.setError(getString(R.string.errore_inserisci_email));
                 editEmail.requestFocus();
                 return;
             }
             if (password.isEmpty()){
-                editPassword.setError("Inserisci password");
+                editPassword.setError(getString(R.string.errore_inserisci_password));
                 editPassword.requestFocus();
                 return;
             }
@@ -59,16 +62,16 @@ public class LoginFragment extends Fragment {
                         // Otteniamo l'ID univoco dell'utente appena loggato
                         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
                         FirebaseManager.sincronizzaTutto(requireContext(), userId, () -> {
-                            Toast.makeText(requireContext(), "Accesso e Sincronizzazione completati!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(requireContext(), R.string.login_successo, Toast.LENGTH_SHORT).show();
                             Navigation.findNavController(view).popBackStack();
                         });
                     })
                     .addOnFailureListener(e -> {
-                        if (e instanceof com.google.firebase.auth.FirebaseAuthInvalidCredentialsException ||
-                                e instanceof com.google.firebase.auth.FirebaseAuthInvalidUserException) {
-                            mostraErrore(textErrore, "Email o password errati. Riprova.");
+                        if (e instanceof FirebaseAuthInvalidCredentialsException ||
+                                e instanceof FirebaseAuthInvalidUserException) {
+                            mostraErrore(textErrore, getString(R.string.errore_credenziali_errate));
                         } else {
-                            mostraErrore(textErrore, "Errore di connessione. Riprova più tardi.");
+                            mostraErrore(textErrore, getString(R.string.errore_connessione));
                         }
                     });
         });
@@ -82,12 +85,12 @@ public class LoginFragment extends Fragment {
             textErrore.setVisibility(View.GONE);
 
             if (email.isEmpty()){
-                editEmail.setError("Inserisci email");
+                editEmail.setError(getString(R.string.errore_inserisci_email));
                 editEmail.requestFocus();
                 return;
             }
             if (password.isEmpty()){
-                editPassword.setError("Inserisci password");
+                editPassword.setError(getString(R.string.errore_inserisci_password));
                 editPassword.requestFocus();
                 return;
             }
@@ -97,19 +100,19 @@ public class LoginFragment extends Fragment {
                         // Otteniamo l'ID univoco dell'utente appena registrato
                         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
                         FirebaseManager.sincronizzaTutto(requireContext(), userId, () -> {
-                            Toast.makeText(requireContext(), "Accesso e Sincronizzazione completati!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(requireContext(), R.string.login_successo, Toast.LENGTH_SHORT).show();
                             Navigation.findNavController(view).popBackStack();
                         });
                     })
                     .addOnFailureListener(e -> {
-                        if (e instanceof com.google.firebase.auth.FirebaseAuthWeakPasswordException) {
-                            mostraErrore(textErrore, "La password è troppo debole (minimo 6 caratteri).");
-                        } else if (e instanceof com.google.firebase.auth.FirebaseAuthUserCollisionException) {
-                            mostraErrore(textErrore, "Esiste già un account con questa email.");
-                        } else if (e instanceof com.google.firebase.auth.FirebaseAuthInvalidCredentialsException) {
-                            mostraErrore(textErrore, "Il formato dell'email non è valido.");
+                        if (e instanceof FirebaseAuthWeakPasswordException) {
+                            mostraErrore(textErrore, getString(R.string.err_password_debole));
+                        } else if (e instanceof FirebaseAuthUserCollisionException) {
+                            mostraErrore(textErrore, getString(R.string.err_email_esistente));
+                        } else if (e instanceof FirebaseAuthInvalidCredentialsException) {
+                            mostraErrore(textErrore, getString(R.string.err_email_invalida));
                         } else {
-                            mostraErrore(textErrore, "Impossibile creare l'account. Riprova.");
+                            mostraErrore(textErrore, getString(R.string.err_generico_account));
                         }
                     });
         });

@@ -6,8 +6,12 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class MeteoManager {
 
@@ -41,16 +45,16 @@ public class MeteoManager {
     // =========================================================================
     private static String[] calcolaDateApi(String dataInizio, String dataFine) {
         try {
-            java.text.SimpleDateFormat formattaIn = new java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.ITALY);
-            java.text.SimpleDateFormat formattaOut = new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.ENGLISH);
+            SimpleDateFormat formattaIn = new SimpleDateFormat("dd/MM/yyyy", Locale.ITALY);
+            SimpleDateFormat formattaOut = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
 
-            java.util.Date inizio = formattaIn.parse(dataInizio);
-            java.util.Date fine = formattaIn.parse(dataFine);
+            Date inizio = formattaIn.parse(dataInizio);
+            Date fine = formattaIn.parse(dataFine);
 
             // Calcoliamo "Oggi + 14 giorni" (limite fisico di Open-Meteo)
-            java.util.Calendar calOggi = java.util.Calendar.getInstance();
-            calOggi.add(java.util.Calendar.DAY_OF_YEAR, 14);
-            java.util.Date limiteApi = calOggi.getTime();
+            Calendar calOggi = Calendar.getInstance();
+            calOggi.add(Calendar.DAY_OF_YEAR, 14);
+            Date limiteApi = calOggi.getTime();
 
             // Se il viaggio INIZIA oltre i 14 giorni da oggi, fermiamo tutto subito
             if (inizio.after(limiteApi)) {
@@ -58,16 +62,16 @@ public class MeteoManager {
             }
 
             // Calcoliamo "Inizio + 6 giorni" (limite grafico per avere max 7 quadratini)
-            java.util.Calendar calInizio = java.util.Calendar.getInstance();
+            Calendar calInizio = Calendar.getInstance();
             calInizio.setTime(inizio);
-            calInizio.add(java.util.Calendar.DAY_OF_YEAR, 6);
-            java.util.Date limiteGrafico = calInizio.getTime();
+            calInizio.add(Calendar.DAY_OF_YEAR, 6);
+            Date limiteGrafico = calInizio.getTime();
 
             // Scegliamo la data di fine corretta. Deve essere la PIÙ PICCOLA tra:
             // - La vera fine del viaggio
             // - Il limite grafico dei 7 giorni
             // - Il limite API dei 14 giorni da oggi
-            java.util.Date fineEffettiva = fine;
+            Date fineEffettiva = fine;
 
             if (fineEffettiva.after(limiteGrafico)) {
                 fineEffettiva = limiteGrafico;
@@ -98,7 +102,7 @@ public class MeteoManager {
                         JSONObject jsonGeo = new JSONObject(geoResponse);
 
                         if (!jsonGeo.has("results")) {
-                            callback.onError("Città non trovata: controlla il nome nel pannello di modifica.");
+                            callback.onError(context.getString(R.string.errore_citta_non_trovata));
                             return;
                         }
 
@@ -111,7 +115,7 @@ public class MeteoManager {
 
                         // Se dateApi è nullo, significa che il viaggio è tutto oltre i 14 giorni
                         if (dateApi == null) {
-                            callback.onError("Le previsioni meteo sono disponibili solo per i prossimi 14 giorni.");
+                            callback.onError(context.getString(R.string.errore_meteo_14_giorni));
                             return;
                         }
 
@@ -142,20 +146,20 @@ public class MeteoManager {
                                         }
                                         callback.onSuccess(listaPrevisioni);
                                     } catch (Exception e) {
-                                        callback.onError("Errore nella lettura dei dati meteo.");
+                                        callback.onError(context.getString(R.string.errore_lettura_meteo));
                                     }
                                 },
-                                error -> callback.onError("Assenza di connessione a internet.")
+                                error -> callback.onError(context.getString(R.string.errore_connessione_meteo))
                         );
 
                         // Aggiungiamo la richiesta del meteo alla coda di Volley
                         queue.add(meteoRequest);
 
                     } catch (Exception e) {
-                        callback.onError("Errore nella geolocalizzazione della città.");
+                        callback.onError(context.getString(R.string.errore_geolocalizzazione));
                     }
                 },
-                error -> callback.onError("Assenza di connessione a internet.")
+                error -> callback.onError(context.getString(R.string.errore_connessione_meteo))
         );
 
         // Aggiungiamo la prima richiesta alla coda di Volley

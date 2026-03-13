@@ -1,5 +1,56 @@
 <resources>
-    <string name="app_name">TripTale</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="app_name" translatable="false">TripTale</string>
+    <string name="viaggio_non_trovato">Viaggio non trovato!</string>
+    <string name="errore_creazione_file">Errore nella creazione del file</string>
+    <string name="errore_titolo_obbligatorio">Il titolo è obbligatorio!</string>
+    <string name="watermark_prefisso" translatable="false">TripTale - </string>
+    <string name="tappa_salvata">Tappa salvata!</string>
+    <string name="errore_titolo_viaggio">Inserisci il titolo del viaggio!</string>
+    <string name="errore_generico">Errore</string>
+    <string name="errore_data_partenza">Seleziona la data di partenza!</string>
+    <string name="errore_data_ritorno">Seleziona la data di ritorno!</string>
+    <string name="errore_date_incongruenti">La data di fine non può precedere l\'inizio!</string>
+    <string name="viaggio_creato_successo">Viaggio creato con successo!</string>
+    <string name="trattino" translatable="false">" - "</string>
+    <string name="elimina_viaggio">Elimina viaggio</string>
+    <string name="elimina">Elimina</string>
+    <string name="annulla">Annulla</string>
+    <string name="msg_elimina_viaggio">Sei sicuro di voler eliminare questo viaggio e tutte le sue tappe?\nL\'azione è irreversibile.</string>
+    <string name="viaggio_eliminato">Viaggio eliminato!</string>
+    <string name="titolo_elimina_tappa">Elimina Tappa</string>
+    <string name="msg_elimina_tappa">Sei sicuro di voler eliminare questa tappa?\nL\'azione è irreversibile.</string>
+    <string name="tappa_eliminata">Tappa eliminata!</string>
+    <string name="meteo_caricamento">Caricamento meteo in corso…</string>
+    <string name="meteo_citta_mancante">Inserisci la città di destinazione nel pannello di modifica per vedere il meteo.</string>
+    <string name="formato_temperatura" translatable="false">%1$d° / %2$d°</string>
+    <string name="errore_meteo_prefisso" translatable="false">🌥️\n%1$s</string>
+    <string name="gestione_account">Gestione account</string>
+    <string name="msg_logout">Sei loggato come:\n%1$s\n\nVuoi disconnetterti?</string>
+    <string name="logout">Logout</string>
+    <string name="logout_successo">Disconnesso con successo!</string>
+    <string name="login_successo">Accesso e Sincronizzazione completati!</string>
+    <string name="errore_inserisci_email">Inserisci email</string>
+    <string name="errore_inserisci_password">Inserisci password</string>
+    <string name="errore_credenziali_errate">Email o password errati. Riprova.</string>
+    <string name="errore_connessione">Errore di connessione. Riprova più tardi.</string>
+    <string name="err_password_debole">La password è troppo debole (minimo 6 caratteri).</string>
+    <string name="err_email_esistente">Esiste già un account con questa email.</string>
+    <string name="err_email_invalida">Il formato dell\'email non è valido.</string>
+    <string name="err_generico_account">Impossibile creare l\'account. Riprova.</string>
+    <string name="avviso_partenza_domani">Domani avrà inizio il viaggio \"%1$s\"!</string>
+    <string name="avviso_viaggio_in_corso">Goditi il viaggio \"%1$s\"!</string>
+    <string name="meteo_domani">\nMeteo di domani: %1$s %2$d/%3$d°C</string>
+    <string name="meteo_oggi">\nMeteo di oggi: %1$s %2$d/%3$d°C</string>
+    <string name="meteo_non_disponibile">\n(Meteo non disponibile)</string>
+    <string name="app_name_notifica" translatable="false">TripTale ✈️</string>
+    <string name="canale_meteo_nome">Promemoria e meteo viaggi</string>
+    <string name="canale_meteo_descrizione">Avvisi sulle partenze imminenti e il meteo giornaliero</string>
+    <string name="errore_citta_non_trovata">Città non trovata: controlla il nome nel pannello di modifica.</string>
+    <string name="errore_meteo_14_giorni">Le previsioni meteo sono disponibili solo per i prossimi 14 giorni.</string>
+    <string name="errore_lettura_meteo">Errore nella lettura dei dati meteo.</string>
+    <string name="errore_connessione_meteo">Assenza di connessione a internet.</string>
+    <string name="errore_geolocalizzazione">Errore nella geolocalizzazione della città.</string>
+    <string name="tappa_aggiornata">Tappa aggiornata!</string>
+    <string name="errore_apertura_fotocamera">Errore nell\'apertura della fotocamera</string>
+    <string name="viaggio_modificato">Viaggio modificato!</string>
 </resources>

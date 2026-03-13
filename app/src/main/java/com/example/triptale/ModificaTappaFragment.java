@@ -1,4 +1,9 @@
 package com.example.triptale;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -16,11 +21,10 @@ import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
-
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -86,7 +90,7 @@ public class ModificaTappaFragment extends Fragment {
                 );
                 scattaFotoLauncher.launch(uriFotoTemporanea);
             } catch (IOException e) {
-                Toast.makeText(requireContext(), "Errore nell'apertura della fotocamera", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), R.string.errore_apertura_fotocamera, Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -105,7 +109,7 @@ public class ModificaTappaFragment extends Fragment {
             tappaCorrente.imagePath = percorsoFotoAttuale;
 
             if(tappaCorrente.titolo.isEmpty()) {
-                editTitolo.setError("Il titolo è obbligatorio!");
+                editTitolo.setError(getString(R.string.errore_titolo_obbligatorio));
                 editTitolo.requestFocus();
                 return;
             }
@@ -136,7 +140,7 @@ public class ModificaTappaFragment extends Fragment {
                 if (!isAdded()) return;
 
                 requireActivity().runOnUiThread(() -> {
-                    Toast.makeText(requireContext(), "Tappa aggiornata!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), R.string.tappa_aggiornata, Toast.LENGTH_SHORT).show();
                     Navigation.findNavController(view).popBackStack();
                 });
             }).start();
@@ -202,42 +206,42 @@ public class ModificaTappaFragment extends Fragment {
     // ==========================================================
     private void ridimensionaEApplicaWatermark(String percorsoFile) {
         // Leggiamo SOLO le dimensioni della foto dai metadati (zero impatto sulla RAM)
-        android.graphics.BitmapFactory.Options options = new android.graphics.BitmapFactory.Options();
+        BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
-        android.graphics.BitmapFactory.decodeFile(percorsoFile, options);
+        BitmapFactory.decodeFile(percorsoFile, options);
 
         // Calcoliamo il fattore di riduzione (es. da 4000px a max 1024px)
         options.inSampleSize = calcolaFattoreRiduzione(options, 1024, 1024);
 
         // Carichiamo la foto VERA in RAM, ma già rimpicciolita
         options.inJustDecodeBounds = false;
-        android.graphics.Bitmap bitmapOriginale = android.graphics.BitmapFactory.decodeFile(percorsoFile, options);
+        Bitmap bitmapOriginale = BitmapFactory.decodeFile(percorsoFile, options);
 
         if (bitmapOriginale == null) return; // Sicurezza extra
 
         // Per poterci "disegnare" sopra, la Bitmap deve essere di tipo "Mutable" (modificabile)
-        android.graphics.Bitmap bitmapModificabile = bitmapOriginale.copy(android.graphics.Bitmap.Config.ARGB_8888, true);
+        Bitmap bitmapModificabile = bitmapOriginale.copy(Bitmap.Config.ARGB_8888, true);
 
         // Prepariamo Canvas e Paint
-        android.graphics.Canvas canvas = new android.graphics.Canvas(bitmapModificabile);
-        android.graphics.Paint pennello = new android.graphics.Paint();
-        pennello.setColor(android.graphics.Color.WHITE); // Testo bianco
+        Canvas canvas = new Canvas(bitmapModificabile);
+        Paint pennello = new Paint();
+        pennello.setColor(Color.WHITE); // Testo bianco
         pennello.setTextSize(70f); // Grandezza testo
         pennello.setAntiAlias(true); // Rende i bordi del testo morbidi
         // Mettiamo un'ombreggiatura nera al testo
-        pennello.setShadowLayer(10f, 5f, 5f, android.graphics.Color.BLACK);
+        pennello.setShadowLayer(10f, 5f, 5f, Color.BLACK);
 
         // Creiamo il nostro testo (es. TripTale - 06/03/2026)
-        String testoWatermark = "TripTale - " + new java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault()).format(new java.util.Date());
+        String testoWatermark = getString(R.string.watermark_prefisso) + new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date());
 
         // Disegniamo il testo in basso a sinistra (x=50, y=altezzaFoto - 50)
         canvas.drawText(testoWatermark, 50, bitmapModificabile.getHeight() - 50, pennello);
 
         // Sovrascriviamo il file originale gigante con questa versione ridimensionata e "timbrata"
-        try (java.io.FileOutputStream out = new java.io.FileOutputStream(percorsoFile)) {
+        try (FileOutputStream out = new FileOutputStream(percorsoFile)) {
             // Comprimiamo in JPEG all'85% di qualità per salvare un sacco di spazio su disco
-            bitmapModificabile.compress(android.graphics.Bitmap.CompressFormat.JPEG, 85, out);
-        } catch (java.io.IOException e) {
+            bitmapModificabile.compress(Bitmap.CompressFormat.JPEG, 85, out);
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -245,7 +249,7 @@ public class ModificaTappaFragment extends Fragment {
     // ==========================================================
     // METODO PER CALCOLARE IL FATTORE DI RIDUZIONE
     // ==========================================================
-    private int calcolaFattoreRiduzione(android.graphics.BitmapFactory.Options options, int reqWidth, int reqHeight) {
+    private int calcolaFattoreRiduzione(BitmapFactory.Options options, int reqWidth, int reqHeight) {
         final int height = options.outHeight;
         final int width = options.outWidth;
         int inSampleSize = 1;
