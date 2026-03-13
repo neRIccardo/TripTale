@@ -28,7 +28,7 @@
     <string name="msg_logout">Sei loggato come:\n%1$s\n\nVuoi disconnetterti?</string>
     <string name="logout">Logout</string>
     <string name="logout_successo">Disconnesso con successo!</string>
-    <string name="login_successo">Accesso e Sincronizzazione completati!</string>
+    <string name="login_successo">Accesso e sincronizzazione completati!</string>
     <string name="errore_inserisci_email">Inserisci email</string>
     <string name="errore_inserisci_password">Inserisci password</string>
     <string name="errore_credenziali_errate">Email o password errati. Riprova.</string>
