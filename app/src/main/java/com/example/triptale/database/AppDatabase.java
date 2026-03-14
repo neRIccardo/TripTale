@@ -1,9 +1,10 @@
-package com.example.triptale;
+package com.example.triptale.database;
 import android.content.Context;
-
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import com.example.triptale.model.Tappa;
+import com.example.triptale.model.Viaggio;
 
 // Diciamo a Room che questo è il Database generale
 // L'array "entities" elenca tutte le tabelle che abbiamo

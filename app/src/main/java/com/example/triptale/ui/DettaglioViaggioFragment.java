@@ -1,4 +1,4 @@
-package com.example.triptale;
+package com.example.triptale.ui;
 import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,6 +15,12 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
+import com.example.triptale.database.AppDatabase;
+import com.example.triptale.network.FirebaseManager;
+import com.example.triptale.network.MeteoManager;
+import com.example.triptale.R;
+import com.example.triptale.model.Tappa;
+import com.example.triptale.model.Viaggio;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.File;

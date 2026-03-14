@@ -1,4 +1,4 @@
-package com.example.triptale;
+package com.example.triptale.ui;
 import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -15,6 +15,8 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import com.example.triptale.R;
+import com.example.triptale.network.MeteoJobService;
 
 public class MainActivity extends AppCompatActivity {
 

@@ -1,10 +1,8 @@
-package com.example.triptale;
+package com.example.triptale.ui;
 import android.app.Activity;
-import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,14 +16,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
+import com.example.triptale.database.AppDatabase;
+import com.example.triptale.network.FirebaseManager;
+import com.example.triptale.R;
+import com.example.triptale.model.Viaggio;
+import com.example.triptale.utils.DateUtils;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
 
 public class ModificaViaggioFragment extends Fragment {
 
@@ -100,8 +97,8 @@ public class ModificaViaggioFragment extends Fragment {
             }
         }
 
-        editDataInizio.setOnClickListener(v -> mostraCalendario(editDataInizio));
-        editDataFine.setOnClickListener(v -> mostraCalendario(editDataFine));
+        editDataInizio.setOnClickListener(v -> DateUtils.mostraCalendario(getContext(), editDataInizio));
+        editDataFine.setOnClickListener(v -> DateUtils.mostraCalendario(getContext(), editDataFine));
 
         // --- GESTIONE BOTTONE SCATTO FOTO ---
         btnScattaFoto.setOnClickListener(v -> {
@@ -126,35 +123,12 @@ public class ModificaViaggioFragment extends Fragment {
             editDataInizio.setError(null);
             editDataFine.setError(null);
 
-            if (titolo.isEmpty()) {
-                editTitolo.setError(getString(R.string.errore_titolo_viaggio));
-                editTitolo.requestFocus();
+            if(!DateUtils.validaCampiObbligatori(requireContext(), editTitolo, editDataInizio, editDataFine, titolo, dataInizio, dataFine))
                 return;
-            }
-            if (dataInizio.isEmpty()) {
-                editDataInizio.setError(getString(R.string.errore_generico));
-                Toast.makeText(requireContext(), R.string.errore_data_partenza, Toast.LENGTH_SHORT).show();
-                return;
-            }
-            if (dataFine.isEmpty()) {
+            if (!DateUtils.sonoDateValide(dataInizio, dataFine)) {
                 editDataFine.setError(getString(R.string.errore_generico));
-                Toast.makeText(requireContext(), R.string.errore_data_ritorno, Toast.LENGTH_SHORT).show();
-                return;
-            }
-            // Controllo logico delle date (L'inizio non può essere dopo la fine)
-            SimpleDateFormat formatoData = new SimpleDateFormat("dd/MM/yyyy", Locale.ITALY);
-            try {
-                Date dataPartenza = formatoData.parse(dataInizio);
-                Date dataRitorno = formatoData.parse(dataFine);
-
-                // Se la data di partenza è successiva a quella di ritorno...
-                if (dataPartenza != null && dataRitorno != null && dataPartenza.after(dataRitorno)) {
-                    editDataFine.setError(getString(R.string.errore_generico));
-                    Toast.makeText(requireContext(), R.string.errore_date_incongruenti, Toast.LENGTH_LONG).show();
-                    return; // Blocchiamo il salvataggio
-                }
-            } catch (ParseException e) {
-                Log.e("ErroreData", "Impossibile leggere la data inserita", e);
+                Toast.makeText(requireContext(), R.string.errore_date_incongruenti, Toast.LENGTH_LONG).show();
+                return; // Blocchiamo il salvataggio
             }
 
             // Aggiorniamo l'oggetto viaggioCorrente con i nuovi dati
@@ -167,12 +141,9 @@ public class ModificaViaggioFragment extends Fragment {
             // Salviamo nel DB usando un Thread
             new Thread(() -> {
                 AppDatabase db = AppDatabase.getInstance(requireContext());
-                List<Viaggio> viaggiAggiornati = db.viaggioDao().ottieniViaggi();
-                for (Viaggio viaggio : viaggiAggiornati) {
-                    if (viaggio.id == viaggioCorrente.id) {
-                        viaggioCorrente.cloudId = viaggio.cloudId;
-                        break;
-                    }
+                Viaggio viaggioAggiornato = db.viaggioDao().ottieniViaggioPerId(viaggioCorrente.id);
+                if (viaggioAggiornato != null) {
+                    viaggioCorrente.cloudId = viaggioAggiornato.cloudId;
                 }
                 db.viaggioDao().aggiornaViaggio(viaggioCorrente);
 
@@ -194,22 +165,5 @@ public class ModificaViaggioFragment extends Fragment {
                 });
             }).start();
         });
-    }
-
-    // =========================================================================
-    // METODO PER APRIRE IL CALENDARIO
-    // =========================================================================
-    private void mostraCalendario(EditText casellaDaRiempire) {
-        Calendar calendario = Calendar.getInstance();
-        int anno = calendario.get(Calendar.YEAR);
-        int mese = calendario.get(Calendar.MONTH);
-        int giorno = calendario.get(Calendar.DAY_OF_MONTH);
-
-        DatePickerDialog dialog = new DatePickerDialog(requireContext(), (view, year, month, dayOfMonth) -> {
-            String dataScelta = String.format(Locale.getDefault(), "%02d/%02d/%04d", dayOfMonth, (month + 1), year);
-            casellaDaRiempire.setText(dataScelta);
-            casellaDaRiempire.setError(null);
-        }, anno, mese, giorno);
-        dialog.show();
     }
 }

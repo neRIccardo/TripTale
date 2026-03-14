@@ -1,4 +1,4 @@
-package com.example.triptale;
+package com.example.triptale.model;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 import android.os.Parcel;

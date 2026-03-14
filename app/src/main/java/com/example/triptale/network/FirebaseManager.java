@@ -1,6 +1,9 @@
-package com.example.triptale;
+package com.example.triptale.network;
 import android.content.Context;
 import android.util.Log;
+import com.example.triptale.database.AppDatabase;
+import com.example.triptale.model.Tappa;
+import com.example.triptale.model.Viaggio;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;

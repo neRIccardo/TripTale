@@ -1,16 +1,17 @@
-package com.example.triptale;
+package com.example.triptale.network;
 import android.Manifest;
 import android.app.PendingIntent;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.navigation.NavDeepLinkBuilder;
-
+import com.example.triptale.database.AppDatabase;
+import com.example.triptale.R;
+import com.example.triptale.model.Viaggio;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;

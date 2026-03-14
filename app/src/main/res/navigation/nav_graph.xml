@@ -6,7 +6,7 @@
     app:startDestination="@id/listaViaggiFragment">
     <fragment
         android:id="@+id/listaViaggiFragment"
-        android:name="com.example.triptale.ListaViaggiFragment"
+        android:name="com.example.triptale.ui.ListaViaggiFragment"
         android:label="fragment_lista_viaggi"
         tools:layout="@layout/fragment_lista_viaggi" >
         <action
@@ -21,12 +21,12 @@
     </fragment>
     <fragment
         android:id="@+id/aggiungiViaggioFragment"
-        android:name="com.example.triptale.AggiungiViaggioFragment"
+        android:name="com.example.triptale.ui.AggiungiViaggioFragment"
         android:label="fragment_aggiungi_viaggio"
         tools:layout="@layout/fragment_aggiungi_viaggio" />
     <fragment
         android:id="@+id/dettaglioViaggioFragment"
-        android:name="com.example.triptale.DettaglioViaggioFragment"
+        android:name="com.example.triptale.ui.DettaglioViaggioFragment"
         android:label="fragment_dettaglio_viaggio"
         tools:layout="@layout/fragment_dettaglio_viaggio" >
         <action
@@ -41,20 +41,20 @@
     </fragment>
     <fragment
         android:id="@+id/aggiungiTappaFragment"
-        android:name="com.example.triptale.AggiungiTappaFragment"
+        android:name="com.example.triptale.ui.AggiungiTappaFragment"
         android:label="fragment_aggiungi_tappa"
         tools:layout="@layout/fragment_aggiungi_tappa" />
     <fragment
         android:id="@+id/modificaViaggioFragment"
-        android:name="com.example.triptale.ModificaViaggioFragment"
+        android:name="com.example.triptale.ui.ModificaViaggioFragment"
         android:label="fragment_modifica_viaggio"
         tools:layout="@layout/fragment_modifica_viaggio" />
     <fragment
         android:id="@+id/modificaTappaFragment"
-        android:name="com.example.triptale.ModificaTappaFragment"
+        android:name="com.example.triptale.ui.ModificaTappaFragment"
         android:label="ModificaTappaFragment" />
     <fragment
         android:id="@+id/loginFragment"
-        android:name="com.example.triptale.LoginFragment"
+        android:name="com.example.triptale.ui.LoginFragment"
         android:label="LoginFragment" />
 </navigation>

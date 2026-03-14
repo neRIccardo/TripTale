@@ -1,5 +1,6 @@
-package com.example.triptale;
+package com.example.triptale.ui;
 import android.app.AlertDialog;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,9 +15,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
+import com.example.triptale.database.AppDatabase;
+import com.example.triptale.R;
+import com.example.triptale.model.Viaggio;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
-
 import java.util.List;
 
 public class ListaViaggiFragment extends Fragment {
@@ -163,10 +166,10 @@ public class ListaViaggiFragment extends Fragment {
 
         if (auth.getCurrentUser() != null) {
             // UTENTE LOGGATO: coloriamo l'icona di Verde
-            btnProfilo.setColorFilter(android.graphics.Color.parseColor("#4CAF50"));
+            btnProfilo.setColorFilter(Color.parseColor("#4CAF50"));
         } else {
             // NON LOGGATO: rimettiamo il colore originale Arancione
-            btnProfilo.setColorFilter(android.graphics.Color.parseColor("#E73B18"));
+            btnProfilo.setColorFilter(Color.parseColor("#E73B18"));
         }
     }
 }
