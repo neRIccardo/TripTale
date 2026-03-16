@@ -166,10 +166,10 @@ public class ListaViaggiFragment extends Fragment {
 
         if (auth.getCurrentUser() != null) {
             // UTENTE LOGGATO: coloriamo l'icona di Verde
-            btnProfilo.setColorFilter(Color.parseColor("#4CAF50"));
+            btnProfilo.setColorFilter(Color.parseColor(getString(R.string.utente_loggato)));
         } else {
             // NON LOGGATO: rimettiamo il colore originale Arancione
-            btnProfilo.setColorFilter(Color.parseColor("#E73B18"));
+            btnProfilo.setColorFilter(Color.parseColor(getString(R.string.utente_non_loggato)));
         }
     }
 }
