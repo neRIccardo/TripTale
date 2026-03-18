@@ -54,6 +54,14 @@ public class ModificaViaggioFragment extends Fragment {
             }
     );
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            viaggioCorrente = getArguments().getParcelable("viaggio_selezionato");
+        }
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -75,24 +83,21 @@ public class ModificaViaggioFragment extends Fragment {
         editDataInizio.setFocusable(false);
         editDataFine.setFocusable(false);
 
-        // Recupero viaggio dal Bundle e precompilazione campi
-        if (getArguments() != null) {
-            viaggioCorrente = getArguments().getParcelable("viaggio_selezionato");
-            if (viaggioCorrente != null) {
-                editTitolo.setText(viaggioCorrente.titolo);
-                editDataInizio.setText(viaggioCorrente.dataInizio);
-                editDataFine.setText(viaggioCorrente.dataFine);
-                editCitta.setText(viaggioCorrente.cittaDestinazione);
+        // Precompilazione campi
+        if (viaggioCorrente != null) {
+            editTitolo.setText(viaggioCorrente.titolo);
+            editDataInizio.setText(viaggioCorrente.dataInizio);
+            editDataFine.setText(viaggioCorrente.dataFine);
+            editCitta.setText(viaggioCorrente.cittaDestinazione);
 
-                if (viaggioCorrente.imagePath != null) {
-                    try {
-                        imageCopertina.setImageURI(Uri.parse(viaggioCorrente.imagePath));
-                        nuovoPercorsoImmagine = viaggioCorrente.imagePath;
-                    } catch (Exception e) {
-                        // L'utente ha cancellato la foto dal telefono o ha revocato i permessi
-                        imageCopertina.setImageResource(android.R.drawable.ic_menu_camera);
-                        nuovoPercorsoImmagine = null; // Resettiamo la variabile, così se l'utente salva, puliamo il DB
-                    }
+            if (viaggioCorrente.imagePath != null) {
+                try {
+                    imageCopertina.setImageURI(Uri.parse(viaggioCorrente.imagePath));
+                    nuovoPercorsoImmagine = viaggioCorrente.imagePath;
+                } catch (Exception e) {
+                    // L'utente ha cancellato la foto dal telefono o ha revocato i permessi
+                    imageCopertina.setImageResource(android.R.drawable.ic_menu_camera);
+                    nuovoPercorsoImmagine = null; // Resettiamo la variabile, così se l'utente salva, puliamo il DB
                 }
             }
         }
@@ -165,5 +170,11 @@ public class ModificaViaggioFragment extends Fragment {
                 });
             }).start();
         });
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        imageCopertina = null;
     }
 }

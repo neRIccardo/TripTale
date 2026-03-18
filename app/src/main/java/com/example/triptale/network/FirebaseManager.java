@@ -27,7 +27,7 @@ public class FirebaseManager {
 
         new Thread(() -> {
             try {
-                AppDatabase roomDb = AppDatabase.getInstance(context);
+                AppDatabase roomDb = AppDatabase.getInstance(context.getApplicationContext());
                 java.util.List<Viaggio> viaggiLocali = roomDb.viaggioDao().ottieniViaggi();
 
                 // 1. UPLOAD VIAGGI OFFLINE
@@ -176,7 +176,7 @@ public class FirebaseManager {
                     // Aggiorniamo il cloudId in Room
                     new Thread(() -> {
                         viaggio.cloudId = documentReference.getId();
-                        AppDatabase.getInstance(context).viaggioDao().aggiornaViaggio(viaggio);
+                        AppDatabase.getInstance(context.getApplicationContext()).viaggioDao().aggiornaViaggio(viaggio);
                     }).start();
                 });
     }
@@ -239,7 +239,7 @@ public class FirebaseManager {
                 .addOnSuccessListener(documentReference -> new Thread(() -> {
                     tappa.cloudId = documentReference.getId();
                     // Aggiorniamo la tappa nel DB locale con il suo nuovo cloudId
-                    AppDatabase.getInstance(context).tappaDao().aggiornaTappa(tappa);
+                    AppDatabase.getInstance(context.getApplicationContext()).tappaDao().aggiornaTappa(tappa);
                 }).start());
     }
 

@@ -91,8 +91,8 @@ public class MeteoManager {
     // =========================================================================
     public static void ottieniPrevisioni(Context context, String citta, String dataInizio, String dataFine, MeteoCallback callback) {
 
-        // Creiamo la coda di richieste Volley
-        RequestQueue queue = Volley.newRequestQueue(context);
+        // Creiamo la coda di richieste Volley usando l'Application Context per evitare Memory Leaks
+        RequestQueue queue = Volley.newRequestQueue(context.getApplicationContext());
 
         // --- FASE 1: GEOCODING ---
         String urlGeocoding = "https://geocoding-api.open-meteo.com/v1/search?name=" + citta.replace(" ", "+") + "&count=1&language=it";

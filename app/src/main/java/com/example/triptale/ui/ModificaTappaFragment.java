@@ -35,6 +35,14 @@ public class ModificaTappaFragment extends Fragment {
     private boolean salvataggioCompletato = false; // Ci dice se l'utente ha premuto "Salva"
     private String cloudIdViaggioCorrente = null;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            tappaCorrente = getArguments().getParcelable("tappa_selezionata");
+            cloudIdViaggioCorrente = getArguments().getString("cloud_id_viaggio", null);
+        }
+    }
 
     @Nullable
     @Override
@@ -52,22 +60,16 @@ public class ModificaTappaFragment extends Fragment {
         Button btnScatta = view.findViewById(R.id.btnScattaFotoTappaModifica);
         Button btnSalva = view.findViewById(R.id.btnSalvaTappaModifica);
 
-        if (getArguments() != null) {
-            tappaCorrente = getArguments().getParcelable("tappa_selezionata");
-            cloudIdViaggioCorrente = getArguments().getString("cloud_id_viaggio", null);
+        if (tappaCorrente != null) {
+            editTitolo.setText(tappaCorrente.titolo);
+            editNote.setText(tappaCorrente.note);
+            percorsoFotoAttuale = tappaCorrente.imagePath;
 
-
-            if (tappaCorrente != null) {
-                editTitolo.setText(tappaCorrente.titolo);
-                editNote.setText(tappaCorrente.note);
-                percorsoFotoAttuale = tappaCorrente.imagePath;
-
-                if (tappaCorrente.imagePath != null) {
-                    try {
-                        imageAnteprima.setImageURI(Uri.parse(tappaCorrente.imagePath));
-                    } catch (Exception e) {
-                        imageAnteprima.setImageResource(android.R.drawable.ic_menu_camera);
-                    }
+            if (tappaCorrente.imagePath != null) {
+                try {
+                    imageAnteprima.setImageURI(Uri.parse(tappaCorrente.imagePath));
+                } catch (Exception e) {
+                    imageAnteprima.setImageResource(android.R.drawable.ic_menu_camera);
                 }
             }
         }
@@ -145,6 +147,7 @@ public class ModificaTappaFragment extends Fragment {
             // Eliminiamo la foto nuova "orfana", mantenendo intatta quella vecchia sul telefono
             new File(percorsoFotoAttuale).delete();
         }
+        imageAnteprima = null;
     }
 
     // =========================================================================

@@ -33,6 +33,16 @@ public class DettaglioViaggioFragment extends Fragment {
     private LinearLayout contenitoreMeteo;
     private TextView textErroreMeteo;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // Controlliamo se ci è stato passato un Bundle
+        if (getArguments() != null) {
+            // Estraiamo l'oggetto serializzato usando la stessa chiave definita prima
+            viaggioCorrente = getArguments().getParcelable("viaggio_selezionato");
+        }
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -53,16 +63,11 @@ public class DettaglioViaggioFragment extends Fragment {
         contenitoreMeteo = view.findViewById(R.id.contenitoreMeteo);
         textErroreMeteo = view.findViewById(R.id.textErroreMeteo);
 
-        // Controlliamo se ci è stato passato un Bundle
-        if (getArguments() != null) {
-            // Estraiamo l'oggetto serializzato usando la stessa chiave definita prima
-            viaggioCorrente = getArguments().getParcelable("viaggio_selezionato");
-            if (viaggioCorrente != null) {
-                // Popoliamo l'interfaccia
-                textTitolo.setText(viaggioCorrente.titolo);
-                String testoData = viaggioCorrente.dataInizio + getString(R.string.trattino) + viaggioCorrente.dataFine;
-                textDate.setText(testoData);
-            }
+        if (viaggioCorrente != null) {
+            // Popoliamo l'interfaccia
+            textTitolo.setText(viaggioCorrente.titolo);
+            String testoData = viaggioCorrente.dataInizio + getString(R.string.trattino) + viaggioCorrente.dataFine;
+            textDate.setText(testoData);
         }
 
         // --- GESTIONE BOTTONE ELIMINA VIAGGIO ---
@@ -132,28 +137,34 @@ public class DettaglioViaggioFragment extends Fragment {
 
             // Ricarichiamo le informazioni del viaggio (es. se abbiamo cambiato titolo o date)
             new Thread(() -> {
-                List<Viaggio> viaggi = AppDatabase.getInstance(requireContext()).viaggioDao().ottieniViaggi();
-                for (Viaggio v : viaggi) {
-                    if (v.id == viaggioCorrente.id) {
+                Viaggio v = AppDatabase.getInstance(requireContext()).viaggioDao().ottieniViaggioPerId(viaggioCorrente.id);
 
-                        if (!isAdded()) return;
+                if (v != null) {
+                    if (!isAdded()) return;
 
-                        requireActivity().runOnUiThread(() -> {
-                            viaggioCorrente = v; // Aggiorniamo l'oggetto "zainetto" interno
+                    requireActivity().runOnUiThread(() -> {
+                        viaggioCorrente = v; // Aggiorniamo il viaggio
 
-                            // Aggiorniamo le scritte a schermo
-                            TextView textTitolo = requireView().findViewById(R.id.textTitoloDettaglio);
-                            TextView textDate = requireView().findViewById(R.id.textDateDettaglio);
-                            textTitolo.setText(v.titolo);
-                            String testoData = v.dataInizio + getString(R.string.trattino) + v.dataFine;
-                            textDate.setText(testoData);
-                            caricaMeteo(v);
-                        });
-                        break;
-                    }
+                        // Aggiorniamo le scritte a schermo
+                        TextView textTitolo = requireView().findViewById(R.id.textTitoloDettaglio);
+                        TextView textDate = requireView().findViewById(R.id.textDateDettaglio);
+                        textTitolo.setText(v.titolo);
+                        String testoData = v.dataInizio + getString(R.string.trattino) + v.dataFine;
+                        textDate.setText(testoData);
+                        caricaMeteo(v);
+                    });
                 }
             }).start();
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        contenitoreTappe = null;
+        scrollMeteo = null;
+        contenitoreMeteo = null;
+        textErroreMeteo = null;
     }
 
     // =========================================================================

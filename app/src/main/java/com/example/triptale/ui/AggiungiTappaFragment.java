@@ -32,6 +32,16 @@ public class AggiungiTappaFragment extends Fragment {
     private boolean salvataggioCompletato = false;
     private String cloudIdViaggioCorrente = null;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // Recuperiamo l'id del viaggio dal bundle
+        if (getArguments() != null) {
+            idViaggioCorrente = getArguments().getInt("id_del_viaggio", -1);
+            cloudIdViaggioCorrente = getArguments().getString("cloud_id_viaggio", null);
+        }
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -42,11 +52,6 @@ public class AggiungiTappaFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Recuperiamo l'id del viaggio dal bundle
-        if (getArguments() != null) {
-            idViaggioCorrente = getArguments().getInt("id_del_viaggio", -1);
-            cloudIdViaggioCorrente = getArguments().getString("cloud_id_viaggio", null);
-        }
         // Controllo di sicurezza
         if (idViaggioCorrente == -1) {
             Toast.makeText(requireContext(), getString(R.string.viaggio_non_trovato), Toast.LENGTH_SHORT).show();
@@ -121,6 +126,7 @@ public class AggiungiTappaFragment extends Fragment {
         if (!salvataggioCompletato && percorsoFotoAttuale != null) {
             new File(percorsoFotoAttuale).delete();
         }
+        imageAnteprima = null;
     }
 
     // =========================================================================

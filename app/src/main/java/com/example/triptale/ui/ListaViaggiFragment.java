@@ -93,6 +93,15 @@ public class ListaViaggiFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        scrollView = null;
+        contenitoreViaggi = null;
+        textEmptyState = null;
+        btnProfiloLogin = null;
+    }
+
     // =====================================================================
     // METODO PER CARICARE I VIAGGI
     // =====================================================================
