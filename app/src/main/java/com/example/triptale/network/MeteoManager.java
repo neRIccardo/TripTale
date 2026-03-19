@@ -94,13 +94,15 @@ public class MeteoManager {
             Date limiteApi = calOggi.getTime();
 
             // Se il viaggio INIZIA oltre i 14 giorni da oggi, fermiamo tutto subito
-            if (inizio.after(limiteApi)) {
+            if (inizio != null && inizio.after(limiteApi)) {
                 return null;
             }
 
             // Calcoliamo "Inizio + 6 giorni" (limite grafico per avere max 7 quadratini)
             Calendar calInizio = Calendar.getInstance();
-            calInizio.setTime(inizio);
+            if (inizio != null) {
+                calInizio.setTime(inizio);
+            }
             calInizio.add(Calendar.DAY_OF_YEAR, 6);
             Date limiteGrafico = calInizio.getTime();
 
@@ -110,16 +112,21 @@ public class MeteoManager {
             // - Il limite API dei 14 giorni da oggi
             Date fineEffettiva = fine;
 
-            if (fineEffettiva.after(limiteGrafico)) {
+            if (fineEffettiva != null && fineEffettiva.after(limiteGrafico)) {
                 fineEffettiva = limiteGrafico;
             }
-            if (fineEffettiva.after(limiteApi)) {
+            if (fineEffettiva != null && fineEffettiva.after(limiteApi)) {
                 fineEffettiva = limiteApi;
             }
-            return new String[]{formattaOut.format(inizio), formattaOut.format(fineEffettiva)};
+            if (inizio != null) {
+                if (fineEffettiva != null) {
+                    return new String[]{formattaOut.format(inizio), formattaOut.format(fineEffettiva)};
+                }
+            }
         } catch (Exception e) {
             return null; // In caso di altri errori
         }
+        return new String[0]; 
     }
 
     /**

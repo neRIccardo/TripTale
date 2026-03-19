@@ -18,6 +18,7 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
+import com.google.firebase.auth.FirebaseUser;
 
 /**
  * Fragment responsabile della gestione dell'autenticazione utente tramite Firebase.
@@ -84,12 +85,15 @@ public class LoginFragment extends Fragment {
 
             mAuth.signInWithEmailAndPassword(email, password)
                     .addOnSuccessListener(authResult -> {
-                        // Otteniamo l'ID univoco dell'utente appena loggato
-                        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                        FirebaseManager.sincronizzaTutto(requireContext(), userId, () -> {
-                            Toast.makeText(requireContext(), R.string.login_successo, Toast.LENGTH_SHORT).show();
-                            Navigation.findNavController(view).popBackStack();
-                        });
+                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                        if (user != null) {
+                            // Otteniamo l'ID univoco dell'utente appena loggato
+                            String userId = user.getUid();
+                            FirebaseManager.sincronizzaTutto(requireContext(), userId, () -> {
+                                Toast.makeText(requireContext(), R.string.login_successo, Toast.LENGTH_SHORT).show();
+                                Navigation.findNavController(view).popBackStack();
+                            });
+                        }
                     })
                     .addOnFailureListener(e -> {
                         if (e instanceof FirebaseAuthInvalidCredentialsException ||
@@ -122,12 +126,15 @@ public class LoginFragment extends Fragment {
 
             mAuth.createUserWithEmailAndPassword(email, password)
                     .addOnSuccessListener(authResult -> {
-                        // Otteniamo l'ID univoco dell'utente appena registrato
-                        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                        FirebaseManager.sincronizzaTutto(requireContext(), userId, () -> {
-                            Toast.makeText(requireContext(), R.string.login_successo, Toast.LENGTH_SHORT).show();
-                            Navigation.findNavController(view).popBackStack();
-                        });
+                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                        if (user != null) {
+                            // Otteniamo l'ID univoco dell'utente appena registrato
+                            String userId = user.getUid();
+                            FirebaseManager.sincronizzaTutto(requireContext(), userId, () -> {
+                                Toast.makeText(requireContext(), R.string.login_successo, Toast.LENGTH_SHORT).show();
+                                Navigation.findNavController(view).popBackStack();
+                            });
+                        }
                     })
                     .addOnFailureListener(e -> {
                         if (e instanceof FirebaseAuthWeakPasswordException) {
