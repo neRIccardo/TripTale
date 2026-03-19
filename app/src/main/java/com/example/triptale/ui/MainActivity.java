@@ -60,24 +60,22 @@ public class MainActivity extends AppCompatActivity {
      */
     private void creaCanaleNotifiche() {
         // I canali servono solo da Android Oreo (API 26) in poi
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            String idCanale = "CANALE_VIAGGI";
-            String nomeCanale = getString(R.string.canale_meteo_nome);
-            String descrizione = getString(R.string.canale_meteo_descrizione);
+        String idCanale = "CANALE_VIAGGI";
+        String nomeCanale = getString(R.string.canale_meteo_nome);
+        String descrizione = getString(R.string.canale_meteo_descrizione);
 
-            // IMPORTANCE_HIGH serve per far apparire il "fumetto" a comparsa in cima allo schermo
-            int importanza = NotificationManager.IMPORTANCE_HIGH;
+        // IMPORTANCE_HIGH serve per far apparire il "fumetto" a comparsa in cima allo schermo
+        int importanza = NotificationManager.IMPORTANCE_HIGH;
 
-            NotificationChannel canale = new NotificationChannel(idCanale, nomeCanale, importanza);
-            canale.setDescription(descrizione);
+        NotificationChannel canale = new NotificationChannel(idCanale, nomeCanale, importanza);
+        canale.setDescription(descrizione);
 
-            // Aggiungiamo anche la vibrazione per essere sicuri che l'utente lo noti
-            canale.enableVibration(true);
+        // Aggiungiamo anche la vibrazione per essere sicuri che l'utente lo noti
+        canale.enableVibration(true);
 
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            if (notificationManager != null) {
-                notificationManager.createNotificationChannel(canale);
-            }
+        NotificationManager notificationManager = getSystemService(NotificationManager.class);
+        if (notificationManager != null) {
+            notificationManager.createNotificationChannel(canale);
         }
     }
 
