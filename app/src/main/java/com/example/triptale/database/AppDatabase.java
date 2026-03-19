@@ -6,13 +6,12 @@ import androidx.room.RoomDatabase;
 import com.example.triptale.model.Tappa;
 import com.example.triptale.model.Viaggio;
 
-@Database(entities = {Viaggio.class, Tappa.class}, version = 1)
-
 /**
  * Classe astratta principale del database Room dell'applicazione.
  * Definisce la configurazione del database locale e fa da punto di accesso
  * per i Data Access Objects (DAO). Utilizza il pattern Singleton.
  */
+@Database(entities = {Viaggio.class, Tappa.class}, version = 1)
 public abstract class AppDatabase extends RoomDatabase {
     // Questa variabile terrà in memoria il nostro database aperto
     private static volatile AppDatabase INSTANCE;
