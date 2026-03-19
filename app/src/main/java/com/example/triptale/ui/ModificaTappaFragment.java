@@ -25,6 +25,12 @@ import com.google.firebase.auth.FirebaseUser;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * Fragment dedicato alla modifica di una Tappa preesistente.
+ * Permette all'utente di aggiornare il titolo, le note e l'immagine associata (scattandone una nuova).
+ * Gestisce in modo sicuro la pulizia e la sovrascrittura dei file immagine sul dispositivo e sincronizza
+ * le modifiche apportate sia sul database locale (Room) sia su quello in cloud (Firebase).
+ */
 public class ModificaTappaFragment extends Fragment {
 
     private Tappa tappaCorrente;
@@ -35,6 +41,13 @@ public class ModificaTappaFragment extends Fragment {
     private boolean salvataggioCompletato = false; // Ci dice se l'utente ha premuto "Salva"
     private String cloudIdViaggioCorrente = null;
 
+    /**
+     * Metodo del ciclo di vita chiamato alla creazione iniziale del Fragment.
+     * Recupera in background l'oggetto Tappa da modificare e l'ID cloud del viaggio padre,
+     * passati tramite Bundle dal Fragment precedente, preparandoli per l'uso nella UI.
+     *
+     * @param savedInstanceState L'eventuale stato precedentemente salvato del Fragment.
+     */
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,12 +57,28 @@ public class ModificaTappaFragment extends Fragment {
         }
     }
 
+    /**
+     * Inizializza e restituisce la gerarchia delle view associata al Fragment.
+     *
+     * @param inflater Il LayoutInflater utilizzato per "gonfiare" il layout XML.
+     * @param container Il ViewGroup padre a cui la UI del Fragment dovrebbe essere attaccata.
+     * @param savedInstanceState Lo stato salvato in precedenza.
+     * @return La View radice del layout del Fragment.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_modifica_tappa, container, false);
     }
 
+    /**
+     * Collega i componenti grafici alle variabili e precompila i campi di testo e l'immagine
+     * con i dati attuali della Tappa. Imposta inoltre i listener per l'acquisizione di una nuova foto
+     * e per il salvataggio definitivo delle modifiche, gestendo l'eventuale cancellazione della vecchia foto.
+     *
+     * @param view La View radice restituita da onCreateView().
+     * @param savedInstanceState L'eventuale stato salvato in precedenza.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -138,6 +167,13 @@ public class ModificaTappaFragment extends Fragment {
         });
     }
 
+    /**
+     * Metodo del ciclo di vita chiamato quando la vista (UI) del Fragment sta per essere distrutta.
+     * Previene perdite di memoria (Memory Leak) sganciando il riferimento all'ImageView.
+     * Svolge inoltre una funzione cruciale di pulizia del disco: se l'utente esce dalla schermata
+     * senza salvare (ad es. premendo "Indietro"), elimina l'eventuale nuova foto scattata
+     * per non occupare spazio inutilmente, mantenendo intatta la foto originale.
+     */
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -150,9 +186,12 @@ public class ModificaTappaFragment extends Fragment {
         imageAnteprima = null;
     }
 
-    // =========================================================================
-    // OGGETTO PER GESTIRE L'INTENT DELLA FOTOCAMERA
-    // =========================================================================
+    /**
+     * Gestore asincrono dell'intent della fotocamera tramite Activity Result API.
+     * In caso di scatto completato con successo, applica il ridimensionamento e il watermark alla nuova foto,
+     * elimina un'eventuale precedente foto temporanea scattata nella stessa sessione di modifica,
+     * e aggiorna l'anteprima a schermo. Se lo scatto viene annullato, rimuove il file temporaneo vuoto (0 byte).
+     */
     private final ActivityResultLauncher<Uri> scattaFotoLauncher = registerForActivityResult(
             new ActivityResultContracts.TakePicture(),
             esitoPositivo -> {

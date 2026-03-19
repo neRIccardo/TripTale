@@ -16,14 +16,36 @@ import com.example.triptale.R;
 import com.example.triptale.model.Viaggio;
 import com.example.triptale.utils.DateUtils;
 
+/**
+ * Fragment dedicato alla creazione di un nuovo Viaggio.
+ * Fornisce l'interfaccia utente per inserire i dettagli principali del viaggio (titolo, città, date),
+ * gestisce l'apertura dei calendari (DatePickerDialog) per la selezione delle date e si occupa della validazione dei campi.
+ * Una volta validati, esegue il salvataggio asincrono nel database locale (Room) e la sincronizzazione in cloud (Firebase).
+ */
 public class AggiungiViaggioFragment extends Fragment {
 
+    /**
+     * Inizializza e restituisce la gerarchia delle view associata al Fragment.
+     *
+     * @param inflater Il LayoutInflater utilizzato per "gonfiare" il layout XML.
+     * @param container Il ViewGroup padre a cui la UI del Fragment dovrebbe essere attaccata.
+     * @param savedInstanceState Lo stato salvato in precedenza.
+     * @return La View radice del layout del Fragment.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_aggiungi_viaggio, container, false);
     }
 
+    /**
+     * Metodo chiamato immediatamente dopo la creazione della gerarchia delle view.
+     * Collega i componenti grafici, disabilita l'input testuale manuale per le date a favore del DatePicker
+     * e imposta la complessa logica di validazione cronologica e salvataggio al click del bottone principale.
+     *
+     * @param view La View radice restituita da onCreateView().
+     * @param savedInstanceState L'eventuale stato salvato in precedenza.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);

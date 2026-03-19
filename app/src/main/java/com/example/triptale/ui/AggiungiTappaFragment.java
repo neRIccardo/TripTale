@@ -23,6 +23,12 @@ import com.example.triptale.model.Tappa;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * Fragment dedicato alla creazione e all'aggiunta di una nuova Tappa a un Viaggio preesistente.
+ * Gestisce l'interfaccia utente per l'inserimento testuale, l'acquisizione di una fotografia
+ * tramite la fotocamera del dispositivo e il salvataggio concorrente sia sul database locale (Room)
+ * sia in cloud (Firebase).
+ */
 public class AggiungiTappaFragment extends Fragment {
     private int idViaggioCorrente = -1; // Variabile per ricordare l'ID del viaggio corrente a cui associare la tappa
     private ImageView imageAnteprima;
@@ -32,6 +38,14 @@ public class AggiungiTappaFragment extends Fragment {
     private boolean salvataggioCompletato = false;
     private String cloudIdViaggioCorrente = null;
 
+
+    /**
+     * Metodo del ciclo di vita chiamato alla creazione iniziale del Fragment.
+     * Si occupa di estrarre in background gli ID (locale e cloud) del viaggio padre passati tramite Bundle,
+     * in modo da avere i dati pronti prima ancora che venga "gonfiata" (inflated) l'interfaccia grafica.
+     *
+     * @param savedInstanceState L'eventuale stato precedentemente salvato del Fragment.
+     */
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,12 +56,28 @@ public class AggiungiTappaFragment extends Fragment {
         }
     }
 
+    /**
+     * Inizializza e restituisce la gerarchia delle view associata al Fragment.
+     *
+     * @param inflater Il LayoutInflater utilizzato per "gonfiare" il layout XML.
+     * @param container Il ViewGroup padre a cui la UI del Fragment dovrebbe essere attaccata.
+     * @param savedInstanceState Lo stato salvato in precedenza.
+     * @return La View radice del layout del Fragment.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_aggiungi_tappa, container, false);
     }
 
+    /**
+     * Metodo chiamato immediatamente dopo la creazione della gerarchia delle view.
+     * Qui vengono collegati i componenti grafici (findViewById), impostati i listener
+     * per i bottoni di scatto foto e salvataggio, e gestita la logica di inserimento dati.
+     *
+     * @param view La View radice restituita da onCreateView().
+     * @param savedInstanceState L'eventuale stato salvato in precedenza.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -119,6 +149,12 @@ public class AggiungiTappaFragment extends Fragment {
         });
     }
 
+    /**
+     * Metodo del ciclo di vita chiamato quando la vista (UI) del Fragment sta per essere distrutta.
+     * Svolge due compiti fondamentali di ottimizzazione:
+     * 1. Elimina fisicamente dal dispositivo le foto "orfane" (scattate ma non salvate).
+     * 2. Previene i Memory Leak sganciando i riferimenti alle View globali.
+     */
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -129,9 +165,12 @@ public class AggiungiTappaFragment extends Fragment {
         imageAnteprima = null;
     }
 
-    // =========================================================================
-    // OGGETTO PER GESTIRE L'INTENT DELLA FOTOCAMERA
-    // =========================================================================
+    /**
+     * Gestore asincrono dell'intent per la fotocamera, basato sulla Activity Result API.
+     * Rimane in attesa dell'esito dello scatto: in caso di successo (esitoPositivo = true),
+     * applica il watermark e il ridimensionamento all'immagine, elimina eventuali foto scattate
+     * precedentemente per lo stesso inserimento e aggiorna l'anteprima a schermo.
+     */
     private final ActivityResultLauncher<Uri> scattaFotoLauncher = registerForActivityResult(
             new ActivityResultContracts.TakePicture(),
             esitoPositivo -> {

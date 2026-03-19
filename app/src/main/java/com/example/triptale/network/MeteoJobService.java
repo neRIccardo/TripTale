@@ -19,8 +19,23 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
 
+/**
+ * Servizio in background schedulato dal sistema operativo tramite JobScheduler.
+ * Si risveglia periodicamente per controllare lo stato dei viaggi locali e inviare
+ * una notifica push se un viaggio è in partenza il giorno successivo o è attualmente in corso,
+ * allegando le previsioni meteo scaricate in tempo reale.
+ */
 public class MeteoJobService extends JobService {
 
+    /**
+     * Punto di ingresso del Job. Poiché i JobService girano di default sul Main Thread,
+     * questo metodo avvia immediatamente un Thread separato per non bloccare l'interfaccia utente.
+     * Utilizza un CountDownLatch per sincronizzare le chiamate di rete asincrone (Volley)
+     * prima di dichiarare il lavoro concluso.
+     *
+     * @param params I parametri forniti dal JobScheduler.
+     * @return true perché il lavoro principale è delegato a un Thread asincrono e non è finito subito.
+     */
     @Override
     public boolean onStartJob(JobParameters params) {
         // Il lavoro del JobService parte qui
@@ -99,15 +114,26 @@ public class MeteoJobService extends JobService {
         return true;
     }
 
+    /**
+     * Metodo chiamato quando il sistema cancella il job.
+     *
+     * @param params I parametri forniti dal JobScheduler.
+     * @return true se il sistema deve riprovare a rilanciare il lavoro, false altrimenti.
+     */
     @Override
     public boolean onStopJob(JobParameters params) {
         // Se il sistema cancella il job prima del previsto, restituiamo true per riprovare dopo
         return true;
     }
 
-    // =========================================================================
-    // METODO PER COSTRUIRE E LANCIARE LA NOTIFICA A SCHERMO
-    // =========================================================================
+    /**
+     * Costruisce e pubblica una notifica di sistema locale.
+     * Imposta un PendingIntent e un DeepLink per far sì che, al tocco della notifica,
+     * l'applicazione si apra direttamente all'interno del Dettaglio del Viaggio specifico.
+     *
+     * @param viaggio Il viaggio a cui si riferisce la notifica.
+     * @param testoDellaNotifica Il messaggio testuale da mostrare all'utente (es. meteo o avviso).
+     */
     private void inviaNotifica(Viaggio viaggio, String testoDellaNotifica) {
         // Controlliamo per sicurezza di avere i permessi
         if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
@@ -125,7 +151,7 @@ public class MeteoJobService extends JobService {
                 .createPendingIntent();
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), "CANALE_VIAGGI")
-                .setSmallIcon(android.R.drawable.ic_dialog_map) // Sostituisci se hai un'altra icona
+                .setSmallIcon(android.R.drawable.ic_dialog_map) // TODO sostituire con un propria icona. Inoltre combiare icona generale dell'app
                 .setCategory(NotificationCompat.CATEGORY_REMINDER)
                 .setContentTitle(getString(R.string.app_name_notifica))
                 .setContentText(testoDellaNotifica)

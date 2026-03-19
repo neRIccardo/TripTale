@@ -24,15 +24,24 @@ import com.example.triptale.utils.DateUtils;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+/**
+ * Fragment dedicato alla modifica di un Viaggio preesistente.
+ * Permette di aggiornare le informazioni testuali (titolo, città, date) e l'immagine di copertina,
+ * selezionandola direttamente dalla galleria del dispositivo. Gestisce il salvataggio asincrono
+ * delle modifiche sul database locale (Room) e l'aggiornamento automatico in cloud (Firebase).
+ */
 public class ModificaViaggioFragment extends Fragment {
 
     private Viaggio viaggioCorrente;
     private ImageView imageCopertina;
     private String nuovoPercorsoImmagine = null; // Qui salveremo la foto scelta
 
-    // =========================================================================
-    // OGGETTO PER GESTIRE L'INTENT DELLA GALLERIA
-    // =========================================================================
+    /**
+     * Gestore asincrono dell'intent per la selezione di documenti (Galleria) tramite Activity Result API.
+     * Recupera l'URI dell'immagine selezionata e richiede esplicitamente ad Android un permesso
+     * di lettura persistente (takePersistableUriPermission), garantendo che l'app possa accedere
+     * all'immagine anche dopo il riavvio del dispositivo, per poi aggiornare la UI.
+     */
     private final ActivityResultLauncher<Intent> apriGalleriaLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
@@ -54,6 +63,13 @@ public class ModificaViaggioFragment extends Fragment {
             }
     );
 
+    /**
+     * Metodo del ciclo di vita chiamato alla creazione iniziale del Fragment.
+     * Estrae in background l'oggetto Viaggio serializzato passato dal Fragment precedente
+     * tramite Bundle, preparandolo per precompilare i campi della UI.
+     *
+     * @param savedInstanceState L'eventuale stato precedentemente salvato del Fragment.
+     */
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,12 +78,29 @@ public class ModificaViaggioFragment extends Fragment {
         }
     }
 
+    /**
+     * Inizializza e restituisce la gerarchia delle view associata al Fragment.
+     *
+     * @param inflater Il LayoutInflater utilizzato per "gonfiare" il layout XML.
+     * @param container Il ViewGroup padre a cui la UI del Fragment dovrebbe essere attaccata.
+     * @param savedInstanceState Lo stato salvato in precedenza.
+     * @return La View radice del layout del Fragment.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_modifica_viaggio, container, false);
     }
 
+    /**
+     * Associa i componenti grafici alle relative logiche di business e precompila la form.
+     * Configura i DatePicker per la selezione delle date, prepara l'intent per la galleria
+     * e implementa una solida logica di validazione prima di sovrascrivere i dati vecchi
+     * con quelli nuovi in modo asincrono (Room + Firebase).
+     *
+     * @param view La View radice restituita da onCreateView().
+     * @param savedInstanceState L'eventuale stato salvato in precedenza.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -172,6 +205,11 @@ public class ModificaViaggioFragment extends Fragment {
         });
     }
 
+    /**
+     * Metodo del ciclo di vita chiamato alla distruzione della UI del Fragment.
+     * Sgancia i riferimenti diretti alle view grafiche, in particolare all'ImageView
+     * della copertina, prevenendo sprechi di memoria (Memory Leak) legati al caricamento dell'immagine.
+     */
     @Override
     public void onDestroyView() {
         super.onDestroyView();

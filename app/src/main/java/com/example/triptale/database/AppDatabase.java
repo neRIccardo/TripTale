@@ -6,22 +6,38 @@ import androidx.room.RoomDatabase;
 import com.example.triptale.model.Tappa;
 import com.example.triptale.model.Viaggio;
 
-// Diciamo a Room che questo è il Database generale
-// L'array "entities" elenca tutte le tabelle che abbiamo
-// La "version = 1" serve se in futuro vorremo aggiungere nuove colonne (es. per il deep learning)
 @Database(entities = {Viaggio.class, Tappa.class}, version = 1)
+
+/**
+ * Classe astratta principale del database Room dell'applicazione.
+ * Definisce la configurazione del database locale e fa da punto di accesso
+ * per i Data Access Objects (DAO). Utilizza il pattern Singleton.
+ */
 public abstract class AppDatabase extends RoomDatabase {
-
-    // Diciamo al database chi sono i DAO
-    public abstract ViaggioDAO viaggioDao();
-    public abstract TappaDAO tappaDao();
-
     // Questa variabile terrà in memoria il nostro database aperto
     private static volatile AppDatabase INSTANCE;
 
-    // =========================================================================
-    // METODO PER CREARE UNA ISTANZA DEL DATABASE
-    // =========================================================================
+    /**
+     * Fornisce il DAO per le operazioni sull'entità Viaggio.
+     *
+     * @return L'istanza di ViaggioDAO.
+     */
+    public abstract ViaggioDAO viaggioDao();
+
+    /**
+     * Fornisce il DAO per le operazioni sull'entità Tappa.
+     *
+     * @return L'istanza di TappaDAO.
+     */
+    public abstract TappaDAO tappaDao();
+
+    /**
+     * Restituisce l'istanza Singleton del database, garantendo che
+     * ne esista solo una in tutta l'applicazione per evitare memory leak e conflitti.
+     *
+     * @param context Il contesto dell'applicazione.
+     * @return L'istanza univoca di AppDatabase.
+     */
     public static AppDatabase getInstance(Context context) {
         if (INSTANCE == null) {
             synchronized (AppDatabase.class) {

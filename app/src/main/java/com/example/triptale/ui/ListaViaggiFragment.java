@@ -22,18 +22,41 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import java.util.List;
 
+/**
+ * Fragment principale dell'applicazione.
+ * Si occupa di mostrare l'elenco completo dei viaggi salvati recuperandoli dal database locale.
+ * Gestisce inoltra la navigazione verso la creazione di nuovi viaggi, la visualizzazione
+ * dei dettagli di un viaggio specifico e il flusso di Login/Logout tramite Firebase Authentication.
+ */
 public class ListaViaggiFragment extends Fragment {
     private ScrollView scrollView;
     private LinearLayout contenitoreViaggi;
     private TextView textEmptyState;
     private ImageButton btnProfiloLogin;
 
+    /**
+     * Inizializza e restituisce la gerarchia delle view associata alla schermata principale.
+     *
+     * @param inflater Il LayoutInflater utilizzato per "gonfiare" il layout XML.
+     * @param container Il ViewGroup padre a cui la UI del Fragment dovrebbe essere attaccata.
+     * @param savedInstanceState Lo stato salvato in precedenza.
+     * @return La View radice del layout del Fragment.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_lista_viaggi, container, false);
     }
 
+    /**
+     * Collega i componenti grafici alle variabili e imposta i listener per i pulsanti.
+     * Include la logica per il pulsante del Profilo, che funge sia da accesso alla schermata
+     * di Login (se l'utente è sloggato) sia da interruttore per il Logout e lo svuotamento
+     * del database locale (se l'utente è già loggato).
+     *
+     * @param view La View radice restituita da onCreateView().
+     * @param savedInstanceState L'eventuale stato salvato in precedenza.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -82,6 +105,11 @@ public class ListaViaggiFragment extends Fragment {
         });
     }
 
+    /**
+     * Metodo del ciclo di vita chiamato ogni volta che la schermata torna in primo piano.
+     * Assicura che la lista dei viaggi e l'icona dello stato di autenticazione siano
+     * costantemente aggiornate se modificati in altre schermate.
+     */
     @Override
     public void onResume() {
         super.onResume();
@@ -93,6 +121,10 @@ public class ListaViaggiFragment extends Fragment {
         }
     }
 
+    /**
+     * Sgancia i riferimenti alle View globali al momento della distruzione della UI
+     * per prevenire pesanti Memory Leak legati alla lista dinamica dei viaggi.
+     */
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -102,9 +134,12 @@ public class ListaViaggiFragment extends Fragment {
         btnProfiloLogin = null;
     }
 
-    // =====================================================================
-    // METODO PER CARICARE I VIAGGI
-    // =====================================================================
+    /**
+     * Esegue una query in background sul database Room per ottenere l'elenco dei viaggi.
+     * In caso di database vuoto, mostra un testo esplicativo (Empty State).
+     * In caso di dati presenti, genera dinamicamente le schede grafiche dei viaggi (item_viaggio.xml)
+     * e le inietta nello ScrollView, associando a ciascuna la navigazione verso il proprio dettaglio.
+     */
     private void caricaViaggiDalDatabase() {
         // Thread per recuperare i viaggi dal database
         new Thread(() -> {
@@ -167,17 +202,20 @@ public class ListaViaggiFragment extends Fragment {
         }).start();
     }
 
-    // =====================================================================
-    // METODO PER AGGIORNARE IL COLORE DELL'ICONA DEL PROFILO
-    // =====================================================================
+    /**
+     * Aggiorna visivamente il colore dell'icona del profilo utente per fornire un feedback
+     * immediato sullo stato di autenticazione (verde per loggato, arancione per ospite).
+     *
+     * @param btnProfilo L'ImageButton da ricolorare.
+     */
     private void aggiornaColoreIcona(ImageButton btnProfilo) {
         FirebaseAuth auth = FirebaseAuth.getInstance();
 
         if (auth.getCurrentUser() != null) {
-            // UTENTE LOGGATO: coloriamo l'icona di Verde
+            // UTENTE LOGGATO: coloriamo l'icona di verde
             btnProfilo.setColorFilter(Color.parseColor(getString(R.string.utente_loggato)));
         } else {
-            // NON LOGGATO: rimettiamo il colore originale Arancione
+            // NON LOGGATO: rimettiamo il colore originale arancione
             btnProfilo.setColorFilter(Color.parseColor(getString(R.string.utente_non_loggato)));
         }
     }

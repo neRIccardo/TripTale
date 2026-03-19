@@ -12,11 +12,20 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+/**
+ * Classe di utilità per la formattazione e la validazione delle date.
+ * Isola la logica di controllo dal codice dell'interfaccia grafica, fornendo
+ * metodi riutilizzabili per l'apertura dei calendari e la verifica dei dati inseriti.
+ */
 public class DateUtils {
 
-    // =========================================================================
-    // METODO PER APRIRE IL CALENDARIO
-    // =========================================================================
+    /**
+     * Apre un DatePickerDialog nativo per permettere all'utente di selezionare una data.
+     * Una volta scelta, la data viene automaticamente formattata e inserita nella casella di testo.
+     *
+     * @param context Il contesto dell'interfaccia corrente, necessario per generare il popup.
+     * @param casellaDaRiempire L'EditText in cui verrà scritta la data selezionata.
+     */
     public static void mostraCalendario(Context context, EditText casellaDaRiempire) {
         Calendar calendario = Calendar.getInstance();
         int anno = calendario.get(Calendar.YEAR);
@@ -31,9 +40,14 @@ public class DateUtils {
         dialog.show();
     }
 
-    // =========================================================================
-    // METODO PER VALIDARE LE DATE (Ritorna true se le date sono valide)
-    // =========================================================================
+    /**
+     * Verifica la coerenza cronologica tra la data di partenza e quella di ritorno.
+     * Previene l'inserimento o la modifica di viaggi in cui il ritorno è antecedente alla partenza.
+     *
+     * @param dataInizio La data di partenza in formato stringa "dd/MM/yyyy".
+     * @param dataFine La data di ritorno in formato stringa "dd/MM/yyyy".
+     * @return true se le date sono logicamente coerenti e valide, false in caso di incongruenza o errore di parsing.
+     */
     public static boolean sonoDateValide(String dataInizio, String dataFine) {
         SimpleDateFormat formatoData = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         try {
@@ -50,6 +64,20 @@ public class DateUtils {
         return true; // Se passa i controlli, le date sono ok
     }
 
+    /**
+     * Valida la completezza dei campi obbligatori all'interno dei form di creazione/modifica.
+     * In caso di campo mancante, evidenzia in automatico l'errore sull'interfaccia grafica
+     * e restituisce l'esito del controllo per bloccare i salvataggi parziali.
+     *
+     * @param context Il contesto per accedere alle risorse testuali dei messaggi di errore.
+     * @param editTitolo Il campo UI relativo al titolo.
+     * @param editDataInizio Il campo UI relativo alla data di partenza.
+     * @param editDataFine Il campo UI relativo alla data di ritorno.
+     * @param titolo Il valore testuale inserito nel titolo.
+     * @param dataInizio Il valore testuale inserito nella data di partenza.
+     * @param dataFine Il valore testuale inserito nella data di ritorno.
+     * @return true se tutti i parametri sono compilati correttamente, false altrimenti.
+     */
     public static boolean validaCampiObbligatori(Context context, EditText editTitolo, EditText editDataInizio, EditText editDataFine, String titolo, String dataInizio, String dataFine) {
         if (titolo.isEmpty()) {
             editTitolo.setError(context.getString(R.string.errore_titolo_viaggio));

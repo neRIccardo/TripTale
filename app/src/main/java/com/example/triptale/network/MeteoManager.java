@@ -14,17 +14,31 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Classe di utilità per la gestione delle chiamate di rete alle API di Open-Meteo.
+ * Utilizza la libreria Volley per eseguire richieste asincrone (prima per il Geocoding
+ * e poi per le previsioni meteo) e restituisce i risultati tramite un'interfaccia di callback.
+ */
 public class MeteoManager {
 
-    // =========================================================================
-    // CLASSE PER "IMPACCHETTARE" I DATI DI UN SINGOLO GIORNO
-    // =========================================================================
+    /**
+     * Struttura dati che rappresenta la previsione meteorologica per un singolo giorno.
+     * Incapsula la data, le temperature minime e massime, e l'icona tradotta in formato Emoji.
+     */
     public static class Previsione {
         public String data;
         public double tempMax;
         public double tempMin;
         public String iconaEmoji;
 
+        /**
+         * Costruttore della classe Previsione.
+         *
+         * @param data Data della previsione.
+         * @param tempMax Temperatura massima prevista.
+         * @param tempMin Temperatura minima prevista.
+         * @param iconaEmoji Emoji corrispondente all'icona meteo.
+         */
         public Previsione(String data, double tempMax, double tempMin, String iconaEmoji) {
             this.data = data;
             this.tempMax = tempMax;
@@ -33,17 +47,39 @@ public class MeteoManager {
         }
     }
 
-    // ===============================================================================
-    // INTERFACCIA USATA DA DettaglioViaggioFragment PER GESTIRE LE RISPOSTE ALLE API
-    // ===============================================================================
+    /**
+     * Interfaccia di comunicazione asincrona.
+     * Permette al chiamante (es. un Fragment) di rimanere in ascolto e ricevere
+     * i dati meteo solo quando la chiamata di rete è terminata con successo o in errore.
+     */
     public interface MeteoCallback {
+
+        /**
+         * Metodo chiamato quando la chiamata di rete è terminata con successo.
+         *
+         * @param previsioni Lista di previsioni meteo trovate.
+         */
         void onSuccess(List<Previsione> previsioni);
+
+        /**
+         * Metodo chiamato quando la chiamata di rete è terminata in errore.
+         *
+         * @param errorMessage Messaggio di errore generato dalla chiamata di rete.
+         */
         void onError(String errorMessage);
     }
 
-    // =========================================================================
-    // METODO PER CALCOLARE LE DATE CORRETTE PER L'API
-    // =========================================================================
+    /**
+     * Calcola la finestra temporale valida per la richiesta API.
+     * Gestisce i limiti fisici del provider (max 14 giorni da oggi) e i limiti
+     * dell'interfaccia grafica (max 7 giorni visualizzabili), garantendo che la chiamata
+     * non vada mai in errore per date troppo lontane.
+     *
+     * @param dataInizio La data di partenza del viaggio.
+     * @param dataFine La data di ritorno del viaggio.
+     * @return Un array di due stringhe [Data Inizio Formattata, Data Fine Formattata],
+     * oppure null se il viaggio è interamente oltre il limite dei 14 giorni.
+     */
     private static String[] calcolaDateApi(String dataInizio, String dataFine) {
         try {
             SimpleDateFormat formattaIn = new SimpleDateFormat("dd/MM/yyyy", Locale.ITALY);
@@ -86,9 +122,16 @@ public class MeteoManager {
         }
     }
 
-    // =========================================================================
-    // METODO PER OTTENERE LE PREVISIONE DEL METEO CON VOLLEY
-    // =========================================================================
+    /**
+     * Esegue due chiamate di rete in sequenza: prima converte il nome della città in coordinate
+     * spaziali (Geocoding), poi utilizza latitudine e longitudine per scaricare le previsioni.
+     *
+     * @param context Il contesto, utile per accedere alle risorse e creare la coda Volley.
+     * @param citta Il nome della città di destinazione.
+     * @param dataInizio La data di partenza.
+     * @param dataFine La data di ritorno.
+     * @param callback L'interfaccia su cui ritornare i risultati (onSuccess) o gli errori (onError).
+     */
     public static void ottieniPrevisioni(Context context, String citta, String dataInizio, String dataFine, MeteoCallback callback) {
 
         // Creiamo la coda di richieste Volley usando l'Application Context per evitare Memory Leaks
@@ -167,9 +210,13 @@ public class MeteoManager {
         queue.add(geoRequest);
     }
 
-    // ===============================================================================================================
-    //  METODO PER TRADURRE IL CODICE DEL METEO IN ICONE (basato sui WMO - World Meteorological Organization - codes)
-    // ===============================================================================================================
+    /**
+     * Traduce un codice meteo in un emoji corrispondente.
+     * Basato sui WMO (World Meteorological Organization) codes.
+     *
+     * @param code Il codice meteo da tradurre.
+     * @return L'emoji corrispondente al codice, oppure "?" se sconosciuto.
+     */
     private static String traduciCodiceInEmoji(int code) {
         if (code == 0) return "☀️"; // Sereno
         if (code == 1 || code == 2 || code == 3) return "⛅"; // Nuvoloso

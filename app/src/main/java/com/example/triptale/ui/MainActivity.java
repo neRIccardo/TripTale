@@ -18,8 +18,20 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.triptale.R;
 import com.example.triptale.network.MeteoJobService;
 
+/**
+ * Activity principale dell'applicazione.
+ * Si occupa del setup globale iniziale al lancio dell'app: gestione dell'interfaccia a tutto schermo,
+ * configurazione dei canali di notifica, richiesta dei permessi a runtime e schedulazione dei servizi in background.
+ */
 public class MainActivity extends AppCompatActivity {
 
+    /**
+     * Metodo del ciclo di vita chiamato alla creazione dell'Activity.
+     * Inizializza l'interfaccia grafica e lancia in sequenza tutti i controlli di sicurezza
+     * e configurazione necessari per il corretto funzionamento delle funzionalità avanzate (notifiche e meteo).
+     *
+     * @param savedInstanceState L'eventuale stato precedentemente salvato dell'Activity.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,9 +52,12 @@ public class MainActivity extends AppCompatActivity {
         programmaControlloGiornaliero();
     }
 
-    // =========================================================================
-    // CREAZIONE DEL CANALE DI NOTIFICA
-    // =========================================================================
+    /**
+     * Inizializza il Notification Channel denominato "CANALE_VIAGGI".
+     * A partire da Android 8.0 (API 26), tutte le notifiche devono obbligatoriamente
+     * appartenere a un canale specifico per permettere all'utente di gestirne le priorità.
+     * Il canale viene impostato con priorità alta e vibrazione per catturare l'attenzione dell'utente.
+     */
     private void creaCanaleNotifiche() {
         // I canali servono solo da Android Oreo (API 26) in poi
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -66,9 +81,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // =========================================================================
-    // RICHIESTA PERMESSO A SCHERMO
-    // =========================================================================
+    /**
+     * Gestisce la richiesta a runtime per il permesso di invio notifiche push.
+     * Necessario a partire da Android 13 (API 33 - Tiramisu). Se il permesso non è ancora
+     * stato garantito, mostra il popup di sistema per la richiesta di autorizzazione.
+     */
     private void chiediPermessoNotifiche() {
         // Il permesso esplicito serve solo da Android Tiramisu (API 33) in poi
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -80,9 +97,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // =========================================================================
-    // PROGRAMMAZIONE DEL CONTROLLO GIORNALIERO (Ogni 24 ore in background)
-    // =========================================================================
+    /**
+     * Registra il MeteoJobService all'interno del JobScheduler di sistema.
+     * Effettua un controllo preventivo per evitare ri-programmazioni multiple dello stesso task.
+     * Il servizio viene schedulato per un'esecuzione periodica ed è contrassegnato come
+     * persistente, garantendo che sopravviva anche in caso di riavvio completo del dispositivo.
+     */
     private void programmaControlloGiornaliero() {
         JobScheduler jobScheduler = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
         if (jobScheduler == null) return;

@@ -26,6 +26,12 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.io.File;
 import java.util.List;
 
+/**
+ * Fragment che funge da "cruscotto" principale per visualizzare e gestire i dettagli di un singolo Viaggio.
+ * Integra la visualizzazione delle tappe (lette dal database locale), le previsioni meteo
+ * dinamiche (recuperate tramite chiamate di rete) e la logica di eliminazione/modifica
+ * sincronizzata con il database in cloud Firebase.
+ */
 public class DettaglioViaggioFragment extends Fragment {
     private Viaggio viaggioCorrente;
     private LinearLayout contenitoreTappe;
@@ -33,6 +39,13 @@ public class DettaglioViaggioFragment extends Fragment {
     private LinearLayout contenitoreMeteo;
     private TextView textErroreMeteo;
 
+    /**
+     * Metodo del ciclo di vita chiamato alla creazione iniziale del Fragment.
+     * Estrae in background l'oggetto Viaggio serializzato (Parcelable) passato dal Fragment
+     * precedente tramite Bundle, rendendo i dati immediatamente disponibili per la UI.
+     *
+     * @param savedInstanceState L'eventuale stato precedentemente salvato del Fragment.
+     */
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,12 +56,29 @@ public class DettaglioViaggioFragment extends Fragment {
         }
     }
 
+    /**
+     * Inizializza e restituisce la gerarchia delle view associata al Fragment.
+     *
+     * @param inflater Il LayoutInflater utilizzato per "gonfiare" il layout XML.
+     * @param container Il ViewGroup padre a cui la UI del Fragment dovrebbe essere attaccata.
+     * @param savedInstanceState Lo stato salvato in precedenza.
+     * @return La View radice del layout del Fragment.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_dettaglio_viaggio, container, false);
     }
 
+    /**
+     * Collega i componenti grafici alle variabili e configura i listener per i pulsanti di azione.
+     * Gestisce la logica complessa di eliminazione del viaggio in modo a cascata,
+     * assicurandosi di cancellare anche le foto salvate su disco, i record in Room, in Firebase
+     * e le eventuali notifiche pendenti.
+     *
+     * @param view La View radice restituita da onCreateView().
+     * @param savedInstanceState L'eventuale stato salvato in precedenza.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -127,6 +157,12 @@ public class DettaglioViaggioFragment extends Fragment {
         });
     }
 
+    /**
+     * Metodo del ciclo di vita chiamato ogni volta che il Fragment torna in primo piano (es. tornando
+     * indietro dalla schermata di modifica o di aggiunta tappa).
+     * Assicura che i dati a schermo (titolo, date, lista delle tappe e meteo) siano sempre
+     * aggiornati interrogando in tempo reale il database locale.
+     */
     @Override
     public void onResume() {
         super.onResume();
@@ -158,6 +194,10 @@ public class DettaglioViaggioFragment extends Fragment {
         }
     }
 
+    /**
+     * Sgancia i riferimenti alle View globali per prevenire l'occupazione inutile
+     * di memoria (Memory Leak) quando il Fragment non è più visibile a schermo.
+     */
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -167,9 +207,14 @@ public class DettaglioViaggioFragment extends Fragment {
         textErroreMeteo = null;
     }
 
-    // =========================================================================
-    // METODO PER CARICARE IL METEO
-    // =========================================================================
+    /**
+     * Gestisce la richiesta asincrona delle previsioni meteorologiche tramite MeteoManager.
+     * In caso di successo (onSuccess), "gonfia" dinamicamente dei blocchi XML per ogni
+     * giorno di previsione e li inserisce in uno scorrimento orizzontale. In caso di fallimento
+     * o assenza di città, mostra un messaggio di errore all'utente.
+     *
+     * @param viaggio L'oggetto Viaggio contenente la città e le date necessarie per le API.
+     */
     private void caricaMeteo(Viaggio viaggio) {
         if (viaggio.cittaDestinazione != null && !viaggio.cittaDestinazione.trim().isEmpty()) {
 
@@ -222,9 +267,13 @@ public class DettaglioViaggioFragment extends Fragment {
         }
     }
 
-    // =========================================================================
-    // METODO PER CARICARE LE TAPPE E POPOLARE IL LINEAR LAYOUT
-    // =========================================================================
+    /**
+     * Interroga in background il database locale per ottenere tutte le tappe relative al viaggio corrente.
+     * Genera dinamicamente a runtime i blocchi dell'interfaccia grafica (item_tappa.xml) e li aggiunge
+     * a cascata al layout principale, agganciando ad ognuno i rispettivi pulsanti di modifica ed eliminazione.
+     *
+     * @param contenitore Il LinearLayout in cui verranno inseriti (iniettati) i blocchi grafici delle tappe.
+     */
     private void caricaTappe(LinearLayout contenitore) {
         new Thread(() -> {
             // Chiediamo al TappaDAO di darci SOLO le tappe di QUESTO viaggio

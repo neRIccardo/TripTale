@@ -17,11 +17,24 @@ import java.util.Map;
 import android.os.Handler;
 import android.os.Looper;
 
+/**
+ * Classe di utilità (Manager) per la gestione della sincronizzazione dei dati
+ * tra il database locale (Room) e il database in cloud (Firebase Firestore).
+ * Utilizza un approccio "Stateless", eseguendo operazioni asincrone in background
+ * per mantenere allineati i dati dell'utente attualmente loggato.
+ */
 public class FirebaseManager {
 
-    // ========================================================================================
-    // METODO PER LA SINCRONIZZAZIONE DI TUTTI I VIAGGI E LE TAPPE
-    // ========================================================================================
+    /**
+     * Esegue una sincronizzazione bidirezionale completa tra il database locale e Firebase.
+     * Effettua l'upload dei viaggi e delle tappe creati offline e scarica eventuali
+     * dati presenti in cloud ma assenti localmente.
+     *
+     * @param context Il contesto dell'applicazione, necessario per accedere al DB locale.
+     * @param userId L'identificatore univoco dell'utente attualmente loggato (tramite Firebase Auth).
+     * @param alTermine Un'azione (Runnable) da eseguire sul Main Thread al completamento
+     * della sincronizzazione (o in caso di errore), utile per sbloccare la UI.
+     */
     public static void sincronizzaTutto(Context context, String userId, Runnable alTermine) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -154,9 +167,14 @@ public class FirebaseManager {
         }).start();
     }
 
-    // ========================================================================================
-    // CREATE: aggiunge un nuovo viaggio al Cloud (quando l'utente lo crea)
-    // ========================================================================================
+    /**
+     * Effettua l'upload di un nuovo viaggio sul database in cloud Firebase.
+     * Una volta completato, aggiorna il record locale in Room salvando il nuovo ID
+     * generato automaticamente dal cloud per mantenere il collegamento.
+     *
+     * @param context Il contesto dell'applicazione per accedere al database locale.
+     * @param viaggio L'oggetto Viaggio da salvare in cloud.
+     */
     public static void aggiungiViaggio(Context context, Viaggio viaggio) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) return; // Se non è loggato, ci fermiamo qui. Ci penserà il Login a fare il merge
@@ -181,9 +199,12 @@ public class FirebaseManager {
                 });
     }
 
-    // ========================================================================================
-    // UPDATE: aggiorna un viaggio esistente sul Cloud (quando l'utente lo modifica)
-    // ========================================================================================
+    /**
+     * Aggiorna i dati di un viaggio preesistente su Firebase, sovrascrivendo il documento
+     * corrispondente al suo cloudId specifico.
+     *
+     * @param viaggio L'oggetto Viaggio contenente i dati modificati e un cloudId valido.
+     */
     public static void aggiornaViaggio(Viaggio viaggio) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null || viaggio.cloudId == null) return;
@@ -203,9 +224,11 @@ public class FirebaseManager {
                 .set(viaggioMap);
     }
 
-    // ========================================================================================
-    // DELETE: elimina un viaggio dal Cloud (quando l'utente lo elimina)
-    // ========================================================================================
+    /**
+     * Rimuove definitivamente un viaggio dal database in cloud Firebase.
+     *
+     * @param cloudId L'identificatore univoco in cloud del viaggio da eliminare.
+     */
     public static void eliminaViaggio(String cloudId) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null || cloudId == null) return;
@@ -217,9 +240,15 @@ public class FirebaseManager {
                 .delete();
     }
 
-    // ========================================================================================
-    // CREATE: aggiunge una nuova tappa al Cloud (quando l'utente la crea)
-    // ========================================================================================
+    /**
+     * Effettua l'upload di una nuova tappa su Firebase, creando un collegamento logico
+     * con il viaggio padre tramite il suo ID cloud.
+     * Successivamente, aggiorna il database locale con l'ID generato dal cloud per la tappa stessa.
+     *
+     * @param context Il contesto dell'applicazione per accedere al database locale.
+     * @param tappa L'oggetto Tappa da salvare.
+     * @param idViaggioCloud L'identificatore in cloud del viaggio a cui appartiene la tappa.
+     */
     public static void aggiungiTappa(Context context, Tappa tappa, String idViaggioCloud) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         // Se non è loggato, o se il viaggio padre non è ancora sul cloud, ci fermiamo
@@ -243,9 +272,12 @@ public class FirebaseManager {
                 }).start());
     }
 
-    // ========================================================================================
-    // UPDATE: aggiorna una tappa esistente sul Cloud (quando l'utente la modifica)
-    // ========================================================================================
+    /**
+     * Aggiorna i dati di una tappa preesistente su Firebase, utilizzando il suo cloudId.
+     *
+     * @param tappa L'oggetto Tappa contenente i dati aggiornati.
+     * @param idViaggioCloud L'identificatore in cloud del viaggio padre associato.
+     */
     public static void aggiornaTappa(Tappa tappa, String idViaggioCloud) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null || tappa.cloudId == null || idViaggioCloud == null) return;
@@ -263,9 +295,11 @@ public class FirebaseManager {
                 .set(tappaMap);
     }
 
-    // ========================================================================================
-    // DELETE: elimina una tappa dal Cloud (quando l'utente la elimina)
-    // ========================================================================================
+    /**
+     * Rimuove definitivamente una tappa dal database in cloud Firebase.
+     *
+     * @param cloudId L'identificatore univoco in cloud della tappa da eliminare.
+     */
     public static void eliminaTappa(String cloudId) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null || cloudId == null) return;

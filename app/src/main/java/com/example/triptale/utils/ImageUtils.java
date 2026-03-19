@@ -15,14 +15,20 @@ import java.util.Date;
 import java.util.Locale;
 
 /**
- * Classe di utilità per la gestione, il ridimensionamento
- * e l'applicazione di watermark alle immagini scattate.
+ * Classe di utilità per la gestione della fotocamera e l'elaborazione delle immagini.
+ * Si occupa della creazione di file temporanei sicuri per l'acquisizione, del ridimensionamento
+ * intelligente per ottimizzare l'uso della RAM e dell'applicazione di watermark (timbro testuale).
  */
 public class ImageUtils {
 
-    // =========================================================================
-    // METODO PER CREARE UN FILE VUOTO PER LA FOTOCAMERA
-    // =========================================================================
+    /**
+     * Crea un file temporaneo univoco all'interno della cartella privata dell'app (Pictures),
+     * pronto per ricevere il flusso di dati binari catturato dalla fotocamera di sistema.
+     *
+     * @param context Il contesto dell'applicazione, necessario per accedere allo storage locale.
+     * @return Un oggetto File univoco, inizialmente vuoto (0 byte).
+     * @throws IOException Se si verifica un errore durante la creazione fisica del file sul disco.
+     */
     public static File creaFileImmagine(Context context) throws IOException {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
         String nomeFile = "JPEG_" + timeStamp + "_";
@@ -32,9 +38,15 @@ public class ImageUtils {
         return File.createTempFile(nomeFile, ".jpg", cartellaStorage);
     }
 
-    // ==========================================================
-    // METODO MANIPOLAZIONE IMMAGINI: RIDIMENSIONAMENTO E WATERMARK
-    // ==========================================================
+    /**
+     * Ottimizza un'immagine salvata su disco: per prevenire OutOfMemoryError (OOM), legge prima
+     * solo i metadati (bounds) dell'immagine, calcola il fattore di riduzione ottimale e poi
+     * la carica in RAM ridimensionata. Successivamente, utilizza Canvas e Paint per sovrimprimere
+     * un watermark testuale. Infine, sovrascrive il file originale comprimendolo in JPEG all'85%.
+     *
+     * @param context Il contesto per accedere alle risorse testuali (il prefisso del watermark).
+     * @param percorsoFile Il percorso assoluto del file immagine originale da elaborare.
+     */
     public static void ridimensionaEApplicaWatermark(Context context, String percorsoFile) {
         // Leggiamo SOLO le dimensioni della foto dai metadati (zero impatto sulla RAM)
         BitmapFactory.Options options = new BitmapFactory.Options();
@@ -77,9 +89,16 @@ public class ImageUtils {
         }
     }
 
-    // ==========================================================
-    // METODO PER CALCOLARE IL FATTORE DI RIDUZIONE
-    // ==========================================================
+    /**
+     * Calcola il fattore matematico (potenza di 2) di riduzione della risoluzione dell'immagine
+     * basandosi sulle dimensioni originali e su quelle massime desiderate. Un inSampleSize pari a 2
+     * restituisce un'immagine con larghezza e altezza dimezzate (quindi 1/4 dei pixel totali).
+     *
+     * @param options L'oggetto BitmapFactory.Options contenente i metadati (larghezza/altezza originali).
+     * @param reqWidth La larghezza massima desiderata per l'output.
+     * @param reqHeight L'altezza massima desiderata per l'output.
+     * @return Il fattore inSampleSize ottimale da applicare in fase di decodifica reale.
+     */
     private static int calcolaFattoreRiduzione(BitmapFactory.Options options, int reqWidth, int reqHeight) {
         final int height = options.outHeight;
         final int width = options.outWidth;

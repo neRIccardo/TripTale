@@ -19,15 +19,38 @@ import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 
+/**
+ * Fragment responsabile della gestione dell'autenticazione utente tramite Firebase.
+ * Fornisce l'interfaccia unificata sia per il Login che per la Registrazione di un nuovo account.
+ * Si occupa della validazione formale degli input, della gestione asincrona delle chiamate di rete
+ * e dell'avvio automatico della sincronizzazione cloud-locale in caso di accesso convalidato.
+ */
 public class LoginFragment extends Fragment {
     private FirebaseAuth mAuth;
 
+    /**
+     * Inizializza e restituisce la gerarchia delle view associata al Fragment di login.
+     *
+     * @param inflater Il LayoutInflater utilizzato per "gonfiare" il layout XML.
+     * @param container Il ViewGroup padre a cui la UI del Fragment dovrebbe essere attaccata.
+     * @param savedInstanceState Lo stato salvato in precedenza.
+     * @return La View radice del layout del Fragment.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_login, container, false);
     }
 
+    /**
+     * Associa i componenti grafici alle relative logiche di business.
+     * Imposta i listener per i pulsanti di "Accedi" e "Registrati", intercettando
+     * in modo puntuale le varie eccezioni restituite da Firebase (es. password troppo debole,
+     * utente inesistente, email già in uso) per fornire un feedback testuale mirato all'utente.
+     *
+     * @param view La View radice restituita da onCreateView().
+     * @param savedInstanceState L'eventuale stato salvato in precedenza.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -120,9 +143,13 @@ public class LoginFragment extends Fragment {
         });
     }
 
-    // =================================================
-    // METODO PER MOSTRARE ERRORE
-    // =================================================
+    /**
+     * Metodo di utilità per semplificare la visualizzazione a schermo dei messaggi di errore
+     * generati durante il processo di autenticazione.
+     *
+     * @param textView La TextView dedicata a mostrare gli alert di errore all'utente.
+     * @param messaggio Il contenuto testuale dell'errore da visualizzare.
+     */
     private void mostraErrore(TextView textView, String messaggio) {
         textView.setText(messaggio);
         textView.setVisibility(View.VISIBLE);
