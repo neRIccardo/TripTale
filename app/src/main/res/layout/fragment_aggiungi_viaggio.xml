@@ -1,105 +1,110 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp"
-    android:background="#121212">
+    android:background="#121212"
+    android:fillViewport="true">
 
-    <TextView
-        android:id="@+id/textTitoloPagina"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Nuovo viaggio"
-        android:textColor="#FFFFFF"
-        android:textSize="28sp"
-        android:textStyle="bold"
-        android:layout_marginTop="32dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:padding="24dp">
 
-    <EditText
-        android:id="@+id/editTitoloViaggio"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:backgroundTint="#E73B18"
-        android:hint="Dove andiamo?"
-        android:inputType="textCapWords"
-        android:minHeight="48dp"
-        android:textColor="#FFFFFF"
-        android:textColorHint="#888888"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textTitoloPagina" />
+        <TextView
+            android:id="@+id/textTitoloPagina"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nuovo viaggio"
+            android:textColor="#FFFFFF"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:layout_marginTop="32dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
-    <EditText
-        android:id="@+id/editCittaViaggio"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:backgroundTint="#E73B18"
-        android:hint="Città di destinazione"
-        android:inputType="textCapWords"
-        android:minHeight="48dp"
-        android:textColor="#FFFFFF"
-        android:textColorHint="#888888"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/editTitoloViaggio" />
+        <EditText
+            android:id="@+id/editTitoloViaggio"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:backgroundTint="#E73B18"
+            android:hint="Dove andiamo?"
+            android:inputType="textCapWords"
+            android:minHeight="48dp"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#888888"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textTitoloPagina" />
 
-    <TextView
-        android:id="@+id/textAiutoCitta"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Riempi il campo per abilitare il servizio di previsioni meteo"
-        android:textColor="#E73B18"
-        android:textSize="12sp"
-        app:layout_constraintTop_toBottomOf="@id/editCittaViaggio"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        <EditText
+            android:id="@+id/editCittaViaggio"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="#E73B18"
+            android:hint="Città di destinazione"
+            android:inputType="textCapWords"
+            android:minHeight="48dp"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#888888"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/editTitoloViaggio" />
 
-    <EditText
-        android:id="@+id/editDataInizio"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:backgroundTint="#E73B18"
-        android:hint="Data di inizio"
-        android:inputType="date"
-        android:minHeight="48dp"
-        android:textColor="#FFFFFF"
-        android:textColorHint="#888888"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textAiutoCitta" />
+        <TextView
+            android:id="@+id/textAiutoCitta"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Riempi il campo per abilitare il servizio di previsioni meteo"
+            android:textColor="#E73B18"
+            android:textSize="12sp"
+            app:layout_constraintTop_toBottomOf="@id/editCittaViaggio"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-    <EditText
-        android:id="@+id/editDataFine"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:backgroundTint="#E73B18"
-        android:hint="Data di fine"
-        android:inputType="date"
-        android:minHeight="48dp"
-        android:textColor="#FFFFFF"
-        android:textColorHint="#888888"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/editDataInizio" />
+        <EditText
+            android:id="@+id/editDataInizio"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:backgroundTint="#E73B18"
+            android:hint="Data di inizio"
+            android:inputType="date"
+            android:minHeight="48dp"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#888888"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textAiutoCitta" />
 
-    <Button
-        android:id="@+id/btnSalvaViaggio"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="48dp"
-        android:text="Salva viaggio"
-        android:textColor="#FFFFFF"
-        android:backgroundTint="#E73B18"
-        app:layout_constraintTop_toBottomOf="@id/editDataFine"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        <EditText
+            android:id="@+id/editDataFine"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:backgroundTint="#E73B18"
+            android:hint="Data di fine"
+            android:inputType="date"
+            android:minHeight="48dp"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#888888"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/editDataInizio" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <Button
+            android:id="@+id/btnSalvaViaggio"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="48dp"
+            android:text="Salva viaggio"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#E73B18"
+            app:layout_constraintTop_toBottomOf="@id/editDataFine"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
