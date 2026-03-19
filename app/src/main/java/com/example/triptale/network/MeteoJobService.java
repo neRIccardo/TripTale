@@ -5,6 +5,7 @@ import android.app.job.JobParameters;
 import android.app.job.JobService;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
@@ -61,7 +62,7 @@ public class MeteoJobService extends JobService {
                     Date dataFine = sdf.parse(v.dataFine);
 
                     // LOGICA DELLE NOTIFICHE: Il viaggio parte domani? Oppure è in corso oggi?
-                    boolean parteDomani = dataInizio.equals(calDomani.getTime());
+                    boolean parteDomani = calDomani.getTime().equals(dataInizio);
                     boolean inCorso = (calOggi.getTime().equals(dataInizio) || calOggi.getTime().after(dataInizio)) &&
                             (calOggi.getTime().equals(dataFine) || calOggi.getTime().before(dataFine));
 
@@ -103,7 +104,7 @@ public class MeteoJobService extends JobService {
                         latch.await();
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    Log.e("TripTale", "Si è verificato un errore", e);
                 }
             }
             // Finito il ciclo sui viaggi, diciamo al sistema che abbiamo concluso il lavoro
