@@ -8,6 +8,8 @@ import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -160,7 +162,9 @@ public class AggiungiTappaFragment extends Fragment {
         super.onDestroyView();
         // Se sta uscendo SENZA salvare e aveva scattato una foto, cancelliamola
         if (!salvataggioCompletato && percorsoFotoAttuale != null) {
-            new File(percorsoFotoAttuale).delete();
+            if (!new File(percorsoFotoAttuale).delete()) {
+                Log.w("TripTale", "Impossibile eliminare il file o file già assente");
+            }
         }
         imageAnteprima = null;
     }
@@ -180,7 +184,9 @@ public class AggiungiTappaFragment extends Fragment {
                         // Se l'utente aveva GIA' scattato una foto in questa sessione
                         // e ha deciso di rifarla, cancelliamo quella precedente
                         if (percorsoFotoAttuale != null) {
-                            new File(percorsoFotoAttuale).delete();
+                            if (!new File(percorsoFotoAttuale).delete()) {
+                                Log.w("TripTale", "Impossibile eliminare il file o file già assente");
+                            }
                         }
                         // Promuoviamo la foto temporanea a foto ufficiale
                         percorsoFotoAttuale = percorsoNuovaFotoTemp;
@@ -190,7 +196,9 @@ public class AggiungiTappaFragment extends Fragment {
                     // L'utente ha premuto INDIETRO sulla fotocamera
                     // Cancelliamo il file da 0 byte
                     if (percorsoNuovaFotoTemp != null) {
-                        new File(percorsoNuovaFotoTemp).delete();
+                        if (!new File(percorsoNuovaFotoTemp).delete()) {
+                            Log.w("TripTale", "Impossibile eliminare il file o file già assente");
+                        }
                         percorsoNuovaFotoTemp = null;
                     }
                 }

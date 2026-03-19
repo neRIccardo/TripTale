@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Environment;
+import android.util.Log;
 import com.example.triptale.R;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -85,7 +86,7 @@ public class ImageUtils {
             // Comprimiamo in JPEG all'85% di qualità per salvare un sacco di spazio su disco
             bitmapModificabile.compress(Bitmap.CompressFormat.JPEG, 85, out);
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e("TripTale", "Si è verificato un errore", e);
         }
     }
 

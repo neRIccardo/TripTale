@@ -1,6 +1,7 @@
 package com.example.triptale.ui;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -125,7 +126,9 @@ public class ModificaTappaFragment extends Fragment {
             if (tappaCorrente.imagePath != null && !tappaCorrente.imagePath.equals(percorsoFotoAttuale)) {
                 File vecchiaFoto = new File(tappaCorrente.imagePath);
                 if (vecchiaFoto.exists()) {
-                    vecchiaFoto.delete();
+                    if (!vecchiaFoto.delete()) {
+                        Log.w("TripTale", "Impossibile eliminare il file o file già assente");
+                    }
                 }
             }
 
@@ -181,7 +184,9 @@ public class ModificaTappaFragment extends Fragment {
         // e ha scattato una foto nuova...
         if (!salvataggioCompletato && percorsoFotoAttuale != null && !percorsoFotoAttuale.equals(tappaCorrente.imagePath)) {
             // Eliminiamo la foto nuova "orfana", mantenendo intatta quella vecchia sul telefono
-            new File(percorsoFotoAttuale).delete();
+            if (!new File(percorsoFotoAttuale).delete()) {
+                Log.w("TripTale", "Impossibile eliminare il file o file già assente");
+            }
         }
         imageAnteprima = null;
     }
@@ -203,7 +208,9 @@ public class ModificaTappaFragment extends Fragment {
                         // Se l'utente aveva scattato un'altra foto "nuova" ma
                         // ha deciso di rifarla, cancelliamo quella precedente per non intasare la memoria
                         if (percorsoFotoAttuale != null && !percorsoFotoAttuale.equals(tappaCorrente.imagePath)) {
-                            new File(percorsoFotoAttuale).delete();
+                            if (!new File(percorsoFotoAttuale).delete()) {
+                                Log.w("TripTale", "Impossibile eliminare il file o file già assente");
+                            }
                         }
                         // Aggiorniamo la foto mostrata a schermo
                         percorsoFotoAttuale = percorsoNuovaFotoTemp;
@@ -213,7 +220,9 @@ public class ModificaTappaFragment extends Fragment {
                     // L'utente ha premuto INDIETRO sulla fotocamera
                     // Cancelliamo il file da 0 byte
                     if (percorsoNuovaFotoTemp != null) {
-                        new File(percorsoNuovaFotoTemp).delete();
+                        if (!new File(percorsoNuovaFotoTemp).delete()) {
+                            Log.w("TripTale", "Impossibile eliminare il file o file già assente");
+                        }
                         percorsoNuovaFotoTemp = null;
                     }
                 }

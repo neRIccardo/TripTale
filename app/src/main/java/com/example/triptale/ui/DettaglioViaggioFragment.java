@@ -1,6 +1,7 @@
 package com.example.triptale.ui;
 import android.app.AlertDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -115,7 +116,9 @@ public class DettaglioViaggioFragment extends Fragment {
                                 if (tappa.imagePath != null) {
                                     File fotoDaCancellare = new File(tappa.imagePath);
                                     if (fotoDaCancellare.exists()) {
-                                        fotoDaCancellare.delete();
+                                        if (!fotoDaCancellare.delete()) {
+                                            Log.w("TripTale", "Impossibile eliminare il file o file già assente");
+                                        }
                                     }
                                 }
                                 if (tappa.cloudId != null && !tappa.cloudId.isEmpty()) {
@@ -330,7 +333,9 @@ public class DettaglioViaggioFragment extends Fragment {
                                 if (tappa.imagePath != null) {
                                     File fotoDaCancellare = new File(tappa.imagePath);
                                     if (fotoDaCancellare.exists()) {
-                                        fotoDaCancellare.delete();
+                                        if (!fotoDaCancellare.delete()) {
+                                            Log.w("TripTale", "Impossibile eliminare il file o file già assente");
+                                        }
                                     }
                                 }
                                 // Cancelliamo la tappa dal database Room
