@@ -26,7 +26,7 @@
             android:layout_height="wrap_content"
             android:hint="@string/hint_titolo_viaggio"
             android:importantForAutofill="no"
-            android:inputType="textCapWords"
+            android:inputType="textCapSentences"
             android:textColor="@color/bianco"
             android:textColorHint="@color/grigio_scuro"
             android:backgroundTint="@color/arancione_triptale"

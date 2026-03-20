@@ -31,7 +31,7 @@
             android:backgroundTint="@color/arancione_triptale"
             android:hint="@string/hint_dove_andiamo"
             android:importantForAutofill="no"
-            android:inputType="textCapWords"
+            android:inputType="textCapSentences"
             android:minHeight="48dp"
             android:textColor="@color/bianco"
             android:textColorHint="@color/grigio_scuro"
