@@ -15,25 +15,26 @@
         android:layout_height="80dp"
         android:scaleType="centerCrop"
         android:src="@android:drawable/ic_menu_camera"
-        android:background="#E73B18"
+        android:background="@color/arancione_triptale"
         android:padding="2dp"
         android:cropToPadding="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:contentDescription="@string/desc_miniatura_viaggio" />
 
     <TextView
         android:id="@+id/textTitoloViaggio"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
-        android:text="Titolo del viaggio"
         android:textSize="20sp"
         android:textStyle="bold"
-        android:textColor="#E73B18"
+        android:textColor="@color/arancione_triptale"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/imageCopertina" />
+        app:layout_constraintEnd_toStartOf="@+id/imageCopertina"
+        tools:text="Viaggio a Parigi" />
 
     <TextView
         android:id="@+id/textDateViaggio"
@@ -41,11 +42,11 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:layout_marginEnd="16dp"
-        android:text="01/08/2024 - 15/08/2024"
         android:textSize="14sp"
-        android:textColor="#B3B3B3"
+        android:textColor="@color/grigio_medio"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textTitoloViaggio"
-        app:layout_constraintEnd_toStartOf="@+id/imageCopertina" />
+        app:layout_constraintEnd_toStartOf="@+id/imageCopertina"
+        tools:text="01/08/2026 - 15/08/2026" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

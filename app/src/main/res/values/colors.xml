@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
-    <string name="utente_loggato">#4CAF50</string>
-    <string name="utente_non_loggato">#E73B18</string>
+    <color name="arancione_triptale">#E73B18</color>
+    <color name="sfondo_principale">#121212</color>
+    <color name="sfondo_secondario">#1E1E1E</color>
+    <color name="sfondo_terziario">#191919</color>
+    <color name="sfondo_card">#2C2C2C</color>
+    <color name="sfondo_pulsante_secondario">#333333</color>
+    <color name="bianco">#FFFFFF</color>
+    <color name="grigio_chiaro">#AAAAAA</color>
+    <color name="grigio_medio_chiaro">#CCCCCC</color>
+    <color name="grigio_medio">#B3B3B3</color>
+    <color name="grigio_scuro">#888888</color>
+    <color name="rosso_errore">#FF5252</color>
+    <color name="verde_successo">#4CAF50</color>
 </resources>

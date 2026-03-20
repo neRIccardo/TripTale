@@ -2,7 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#121212"
+    android:background="@color/sfondo_principale"
     android:fillViewport="true">
 
     <LinearLayout
@@ -14,8 +14,8 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Modifica viaggio"
-            android:textColor="#FFFFFF"
+            android:text="@string/titolo_modifica_viaggio"
+            android:textColor="@color/bianco"
             android:textSize="28sp"
             android:textStyle="bold"
             android:layout_marginBottom="24dp"/>
@@ -24,28 +24,31 @@
             android:id="@+id/editTitoloModifica"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Titolo viaggio"
-            android:textColor="#FFFFFF"
-            android:textColorHint="#888888"
-            android:backgroundTint="#E73B18"
+            android:hint="@string/hint_titolo_viaggio"
+            android:importantForAutofill="no"
+            android:inputType="textCapWords"
+            android:textColor="@color/bianco"
+            android:textColorHint="@color/grigio_scuro"
+            android:backgroundTint="@color/arancione_triptale"
             android:layout_marginBottom="8dp"/>
 
         <EditText
             android:id="@+id/editCittaModifica"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Città di destinazione"
-            android:textColor="#FFFFFF"
-            android:textColorHint="#888888"
-            android:backgroundTint="#E73B18"
+            android:hint="@string/hint_citta_destinazione"
+            android:importantForAutofill="no"
+            android:textColor="@color/bianco"
+            android:textColorHint="@color/grigio_scuro"
+            android:backgroundTint="@color/arancione_triptale"
             android:inputType="textCapWords"
             android:layout_marginBottom="4dp"/>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Riempi il campo per abilitare il servizio di previsioni meteo"
-            android:textColor="#E73B18"
+            android:text="@string/aiuto_citta_meteo"
+            android:textColor="@color/arancione_triptale"
             android:textSize="12sp"
             android:layout_marginBottom="16dp" />
 
@@ -53,37 +56,42 @@
             android:id="@+id/editDataInizioModifica"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Data Inizio"
-            android:textColor="#FFFFFF"
-            android:textColorHint="#888888"
-            android:backgroundTint="#E73B18"
+            android:hint="@string/hint_data_inizio"
+            android:importantForAutofill="no"
+            android:inputType="date"
+            android:textColor="@color/bianco"
+            android:textColorHint="@color/grigio_scuro"
+            android:backgroundTint="@color/arancione_triptale"
             android:layout_marginBottom="16dp"/>
 
         <EditText
             android:id="@+id/editDataFineModifica"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Data Fine"
-            android:textColor="#FFFFFF"
-            android:textColorHint="#888888"
-            android:backgroundTint="#E73B18"
+            android:hint="@string/hint_data_fine"
+            android:inputType="date"
+            android:importantForAutofill="no"
+            android:textColor="@color/bianco"
+            android:textColorHint="@color/grigio_scuro"
+            android:backgroundTint="@color/arancione_triptale"
             android:layout_marginBottom="24dp"/>
 
         <ImageView
             android:id="@+id/imageCopertinaViaggio"
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:background="#1E1E1E"
+            android:background="@color/sfondo_secondario"
             android:scaleType="centerCrop"
-            android:layout_marginBottom="16dp"/>
+            android:layout_marginBottom="16dp"
+            android:contentDescription="@string/desc_copertina_viaggio"/>
 
         <Button
             android:id="@+id/btnSelezionaFotoCopertina"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Seleziona copertina del viaggio"
-            android:backgroundTint="#333333"
-            android:textColor="#FFFFFF"
+            android:text="@string/btn_seleziona_copertina"
+            android:backgroundTint="@color/sfondo_pulsante_secondario"
+            android:textColor="@color/bianco"
             android:layout_marginBottom="32dp"/>
 
         <View
@@ -95,9 +103,9 @@
             android:id="@+id/btnSalvaModifiche"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:text="SALVA MODIFICHE"
-            android:backgroundTint="#E73B18"
-            android:textColor="#FFFFFF"
+            android:text="@string/btn_salva_modifiche"
+            android:backgroundTint="@color/arancione_triptale"
+            android:textColor="@color/bianco"
             android:textStyle="bold"/>
     </LinearLayout>
 </ScrollView>

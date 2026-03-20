@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#121212"
+    android:background="@color/sfondo_principale"
     android:fillViewport="true">
 
     <LinearLayout
@@ -15,8 +15,8 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Modifica tappa"
-            android:textColor="#FFFFFF"
+            android:text="@string/titolo_modifica_tappa"
+            android:textColor="@color/bianco"
             android:textSize="28sp"
             android:textStyle="bold"
             android:layout_marginBottom="24dp"/>
@@ -25,11 +25,12 @@
             android:id="@+id/editTitoloTappaModifica"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Modifica il tittolo qui..."
-            android:textColorHint="#888888"
+            android:hint="@string/hint_modifica_titolo_tappa"
+            android:importantForAutofill="no"
+            android:textColorHint="@color/grigio_scuro"
             android:minHeight="48dp"
-            android:textColor="#FFFFFF"
-            android:backgroundTint="#E73B18"
+            android:textColor="@color/bianco"
+            android:backgroundTint="@color/arancione_triptale"
             android:inputType="textCapSentences"
             android:layout_marginBottom="16dp"/>
 
@@ -37,10 +38,11 @@
             android:id="@+id/editNoteTappaModifica"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColorHint="#888888"
-            android:hint="Modifica le note qui..."
-            android:textColor="#FFFFFF"
-            android:backgroundTint="#E73B18"
+            android:importantForAutofill="no"
+            android:textColorHint="@color/grigio_scuro"
+            android:hint="@string/hint_modifica_note_tappa"
+            android:textColor="@color/bianco"
+            android:backgroundTint="@color/arancione_triptale"
             android:inputType="textMultiLine"
             android:minLines="4"
             android:gravity="top"
@@ -50,26 +52,27 @@
             android:id="@+id/imageAnteprimaTappaModifica"
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:background="#1E1E1E"
+            android:background="@color/sfondo_secondario"
             android:scaleType="fitCenter"
-            android:layout_marginBottom="16dp"/>
+            android:layout_marginBottom="16dp"
+            android:contentDescription="@string/desc_anteprima_foto_modificata"/>
 
         <Button
             android:id="@+id/btnScattaFotoTappaModifica"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Scatta una nuovo foto"
-            android:backgroundTint="#333333"
-            android:textColor="#FFFFFF"
+            android:text="@string/btn_scatta_nuova_foto"
+            android:backgroundTint="@color/sfondo_pulsante_secondario"
+            android:textColor="@color/bianco"
             android:layout_marginBottom="32dp"/>
 
         <Button
             android:id="@+id/btnSalvaTappaModifica"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:text="SALVA MODIFICHE"
-            android:backgroundTint="#E73B18"
-            android:textColor="#FFFFFF"
+            android:text="@string/btn_salva_modifiche"
+            android:backgroundTint="@color/arancione_triptale"
+            android:textColor="@color/bianco"
             android:textStyle="bold"
             android:textSize="18sp"/>
 

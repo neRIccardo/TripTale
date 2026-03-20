@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#121212"
+    android:background="@color/sfondo_principale"
     android:fillViewport="true">
 
     <LinearLayout
@@ -15,8 +15,8 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Nuova tappa"
-            android:textColor="#FFFFFF"
+            android:text="@string/titolo_nuova_tappa"
+            android:textColor="@color/bianco"
             android:textSize="28sp"
             android:textStyle="bold"
             android:layout_marginBottom="24dp"/>
@@ -25,11 +25,12 @@
             android:id="@+id/editTitoloTappa"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Es. Tour Eiffel"
-            android:textColorHint="#888888"
+            android:hint="@string/hint_titolo_tappa"
+            android:importantForAutofill="no"
+            android:textColorHint="@color/grigio_scuro"
             android:minHeight="48dp"
-            android:textColor="#FFFFFF"
-            android:backgroundTint="#E73B18"
+            android:textColor="@color/bianco"
+            android:backgroundTint="@color/arancione_triptale"
             android:inputType="textCapSentences"
             android:layout_marginBottom="16dp"/>
 
@@ -37,10 +38,11 @@
             android:id="@+id/editNoteTappa"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Scrivi una nota del diario qui..."
-            android:textColorHint="#888888"
-            android:textColor="#FFFFFF"
-            android:backgroundTint="#E73B18"
+            android:hint="@string/hint_note_tappa"
+            android:importantForAutofill="no"
+            android:textColorHint="@color/grigio_scuro"
+            android:textColor="@color/bianco"
+            android:backgroundTint="@color/arancione_triptale"
             android:inputType="textMultiLine"
             android:minLines="4"
             android:gravity="top"
@@ -50,26 +52,27 @@
             android:id="@+id/imageAnteprimaFoto"
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:background="#1E1E1E"
+            android:background="@color/sfondo_secondario"
             android:scaleType="fitCenter"
-            android:layout_marginBottom="16dp"/>
+            android:layout_marginBottom="16dp"
+            android:contentDescription="@string/desc_anteprima_foto"/>
 
         <Button
             android:id="@+id/btnScattaFoto"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Scatta foto"
-            android:backgroundTint="#333333"
-            android:textColor="#FFFFFF"
+            android:text="@string/btn_scatta_foto"
+            android:backgroundTint="@color/sfondo_pulsante_secondario"
+            android:textColor="@color/bianco"
             android:layout_marginBottom="32dp"/>
 
         <Button
             android:id="@+id/btnSalvaTappa"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:text="SALVA TAPPA"
-            android:backgroundTint="#E73B18"
-            android:textColor="#FFFFFF"
+            android:text="@string/btn_salva_tappa"
+            android:backgroundTint="@color/arancione_triptale"
+            android:textColor="@color/bianco"
             android:textStyle="bold"
             android:textSize="18sp"/>
 

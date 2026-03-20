@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -12,9 +13,10 @@
         android:id="@+id/textDataMeteo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="#AAAAAA"
+        android:textColor="@color/grigio_chiaro"
         android:textSize="12sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        tools:text="15/08" />
 
     <TextView
         android:id="@+id/textIconaMeteo"
@@ -22,14 +24,16 @@
         android:layout_height="wrap_content"
         android:textSize="28sp"
         android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp" />
+        android:layout_marginBottom="8dp"
+        tools:text="☀️" />
 
     <TextView
         android:id="@+id/textTempMeteo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="#FFFFFF"
+        android:textColor="@color/bianco"
         android:textSize="14sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        tools:text="25° - 32°" />
 
 </LinearLayout>

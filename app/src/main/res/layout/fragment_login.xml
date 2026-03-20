@@ -2,7 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#121212"
+    android:background="@color/sfondo_principale"
     android:fillViewport="true">
 
     <LinearLayout
@@ -15,8 +15,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Benvenuto su TripTale"
-            android:textColor="#FFFFFF"
+            android:text="@string/titolo_benvenuto_login"
+            android:textColor="@color/bianco"
             android:textSize="28sp"
             android:textStyle="bold"
             android:layout_marginBottom="32dp" />
@@ -25,29 +25,31 @@
             android:id="@+id/editEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Email"
+            android:hint="@string/hint_email"
+            android:importantForAutofill="no"
             android:inputType="textEmailAddress"
-            android:textColor="#FFFFFF"
-            android:textColorHint="#888888"
-            android:backgroundTint="#E73B18"
+            android:textColor="@color/bianco"
+            android:textColorHint="@color/grigio_scuro"
+            android:backgroundTint="@color/arancione_triptale"
             android:layout_marginBottom="16dp" />
 
         <EditText
             android:id="@+id/editPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Password"
+            android:hint="@string/hint_password"
+            android:importantForAutofill="no"
             android:inputType="textPassword"
-            android:textColor="#FFFFFF"
-            android:textColorHint="#888888"
-            android:backgroundTint="#E73B18"
+            android:textColor="@color/bianco"
+            android:textColorHint="@color/grigio_scuro"
+            android:backgroundTint="@color/arancione_triptale"
             android:layout_marginBottom="32dp" />
 
         <TextView
             android:id="@+id/textErrore"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="#FF5252"
+            android:textColor="@color/rosso_errore"
             android:textSize="14sp"
             android:textAlignment="center"
             android:layout_marginBottom="16dp"
@@ -57,18 +59,18 @@
             android:id="@+id/btnAccedi"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Accedi"
-            android:backgroundTint="#E73B18"
-            android:textColor="#FFFFFF"
+            android:text="@string/btn_accedi"
+            android:backgroundTint="@color/arancione_triptale"
+            android:textColor="@color/bianco"
             android:layout_marginBottom="16dp" />
 
         <Button
             android:id="@+id/btnRegistrati"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Nuovo utente? Registrati"
-            android:backgroundTint="#333333"
-            android:textColor="#FFFFFF" />
+            android:text="@string/btn_registrati"
+            android:backgroundTint="@color/sfondo_pulsante_secondario"
+            android:textColor="@color/bianco" />
 
     </LinearLayout>
 </ScrollView>
