@@ -1,6 +1,7 @@
 # ✈️ TripTale
 
-> **Pianifica, vivi e ricorda le tue avventure in giro per il mondo.** > TripTale è un'applicazione Android nativa progettata per i viaggiatori che desiderano avere il proprio itinerario e il proprio diario di viaggio sempre a portata di mano, sia online che offline.
+> **Pianifica, vivi e ricorda le tue avventure in giro per il mondo.**
+> TripTale è un'applicazione Android nativa progettata per i viaggiatori che desiderano avere il proprio itinerario e il proprio diario di viaggio sempre a portata di mano, sia online che offline.
 
 ---
 
@@ -24,7 +25,7 @@ L'applicazione è sviluppata interamente in **Java** seguendo le linee guida e l
 * **Database Locale:** **Room Persistence Library** (SQLite astratto) combinato con operazioni asincrone multi-thread.
 * **Backend as a Service (BaaS):** **Firebase** (Auth e Realtime Database/Firestore).
 * **Background Tasks:** Schedulazione dei servizi meteo tramite **JobScheduler**.
-* **Gestione Permessi e Media:** Implementazione della moderna **Activity Result API** per l'acquisizione sicura di immagini dalla fotocamera e dalla galleria (`ACTION_OPEN_DOCUMENT` con permessi persistenti URI).
+* **Gestione Permessi e Media:** Implementazione della moderna **Activity Result API** per l'acquisizione sicura di immagini dalla fotocamera e dalla galleria.
 
 ---
 
@@ -32,60 +33,42 @@ L'applicazione è sviluppata interamente in **Java** seguendo le linee guida e l
 
 Se desideri clonare e compilare questo progetto localmente, segui questi passaggi:
 
-### Prerequisiti
-* **Android Studio** (versione Iguana o superiore consigliata).
-* **SDK Android** (Min API 26 - Target API 34+).
+**1. Clona la repository:**
+Apri il terminale e digita il seguente comando: `git clone https://github.com/neRIccardo/TripTale.git`
 
-### Passaggi
+**2. Apri il progetto:**
+Apri Android Studio e seleziona "File > Open", quindi naviga fino alla cartella clonata.
 
-1. **Clona la repository:**
-   ```bash
-   git clone [https://github.com/tuo-username/TripTale.git](https://github.com/tuo-username/TripTale.git)
-Apri il progetto:
-Apri Android Studio e seleziona File > Open, quindi naviga fino alla cartella clonata.
+**3. Configura Firebase:**
+Crea un progetto su Firebase Console, aggiungi un'app Android registrando il package name (`com.example.triptale`), scarica il file `google-services.json` e inseriscilo nella cartella `app/` del progetto. Abilita l'autenticazione via Email/Password.
 
-Configura Firebase:
+**4. Configura l'API Meteo (Opzionale):**
+Assicurati di inserire la tua chiave API per il meteo all'interno di `MeteoManager.java` o `local.properties`.
 
-Crea un progetto su Firebase Console.
-
-Aggiungi un'app Android registrando il package name (com.example.triptale).
-
-Scarica il file google-services.json e inseriscilo nella cartella app/ del progetto.
-
-Abilita l'autenticazione via Email/Password in Firebase.
-
-Configura l'API Meteo (Opzionale):
-
-Nota: Assicurati di inserire la tua chiave API per il meteo all'interno di MeteoManager.java o local.properties.
-
-Compila e avvia:
+**5. Compila e avvia:**
 Sincronizza Gradle e premi Run per testare l'app su un emulatore o un dispositivo fisico.
 
-📂 Struttura del Progetto
+---
+
+## 📂 Struttura del Progetto
+
 Una panoramica dei pacchetti principali:
 
-ui/ : Contiene la MainActivity e tutti i Fragment (Login, Home, Dettaglio, Aggiunta/Modifica).
+* `ui/` : Contiene la `MainActivity` e tutti i `Fragment` (Login, Home, Dettaglio, Aggiunta/Modifica).
+* `model/` : Entità dati (POJO) come `Viaggio` e `Tappa` utilizzate da Room e Firebase.
+* `database/` : Configurazione del database locale `AppDatabase` e relative interfacce DAO.
+* `network/` : Logica di rete, inclusi `FirebaseManager`, chiamate API (`MeteoManager`) e servizi in background (`MeteoJobService`).
+* `utils/` : Classi di utilità stateless (`DateUtils`, `ImageUtils`) per validazioni, gestione calendari ed elaborazione immagini.
 
-model/ : Entità dati (POJO) come Viaggio e Tappa utilizzate da Room e Firebase.
+---
 
-database/ : Configurazione del database locale AppDatabase e relative interfacce DAO.
+## 🚀 Sviluppi Futuri (To-Do)
 
-network/ : Logica di rete, inclusi FirebaseManager, chiamate API (MeteoManager) e servizi in background (MeteoJobService).
+* [ ] Implementazione del Deep Learning (CNN) per l'auto-categorizzazione delle foto (es. mare, montagna, città).
 
-utils/ : Classi di utilità stateless (DateUtils, ImageUtils) per validazioni, gestione calendari ed elaborazione immagini (watermark).
+---
 
-🚀 Sviluppi Futuri (To-Do)
-[ ] Implementazione del Deep Learning (CNN) per l'auto-categorizzazione delle foto (es. mare, montagna, città).
+## 👨‍💻 Autore
 
-[ ] Esportazione del diario di viaggio in formato PDF.
-
-[ ] Condivisione dei viaggi con altri utenti dell'app.
-
-👨‍💻 Autore
-[Il Tuo Nome e Cognome]
-
-GitHub: @tuo-username
-
-LinkedIn: Il Tuo Profilo
-
-Progetto sviluppato per finalità didattiche / Esame universitario.
+**[Riccardo Neri]**
+---
