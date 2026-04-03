@@ -62,13 +62,6 @@ Una panoramica dei pacchetti principali:
 
 ---
 
-## 🚀 Sviluppi Futuri (To-Do)
-
-* [ ] Implementazione del Deep Learning (CNN) per l'auto-categorizzazione delle foto (es. mare, montagna, città).
-
----
-
 ## 👨‍💻 Autore
 
 **[Riccardo Neri]**
----
