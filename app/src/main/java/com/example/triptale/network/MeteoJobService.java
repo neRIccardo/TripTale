@@ -152,7 +152,7 @@ public class MeteoJobService extends JobService {
                 .createPendingIntent();
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), "CANALE_VIAGGI")
-                .setSmallIcon(android.R.drawable.ic_dialog_map) // TODO sostituire con un propria icona. Inoltre combiare icona generale dell'app
+                .setSmallIcon(R.mipmap.triptale)
                 .setCategory(NotificationCompat.CATEGORY_REMINDER)
                 .setContentTitle(getString(R.string.app_name_notifica))
                 .setContentText(testoDellaNotifica)
