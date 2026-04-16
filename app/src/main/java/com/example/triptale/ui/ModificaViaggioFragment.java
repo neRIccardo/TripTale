@@ -138,6 +138,17 @@ public class ModificaViaggioFragment extends Fragment {
         editDataInizio.setOnClickListener(v -> DateUtils.mostraCalendario(getContext(), editDataInizio));
         editDataFine.setOnClickListener(v -> DateUtils.mostraCalendario(getContext(), editDataFine));
 
+        // --- RIPRISTINO DELLO STATO DOPO LA ROTAZIONE ---
+        if (savedInstanceState != null) {
+            // Recuperiamo il percorso salvato
+            nuovoPercorsoImmagine = savedInstanceState.getString("percorsoImmagineSalvato");
+
+            // Se avevamo una nuova immagine, la mostriamo di nuovo
+            if (nuovoPercorsoImmagine != null) {
+                imageCopertina.setImageURI(Uri.parse(nuovoPercorsoImmagine));
+            }
+        }
+
         // --- GESTIONE BOTTONE SCATTO FOTO ---
         btnScattaFoto.setOnClickListener(v -> {
             // ACTION_OPEN_DOCUMENT assegna automaticamente un permesso temporaneo in lettura
@@ -214,5 +225,18 @@ public class ModificaViaggioFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         imageCopertina = null;
+    }
+
+    /**
+     * Metodo del ciclo di vita chiamato quando il Fragment viene distrutto per salvare lo stato attuale.
+     * @param outState L'eventuale stato salvato in precedenza.
+     */
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        // Salviamo il percorso della nuova immagine di copertina se esiste
+        if (nuovoPercorsoImmagine != null) {
+            outState.putString("percorsoImmagineSalvato", nuovoPercorsoImmagine);
+        }
     }
 }

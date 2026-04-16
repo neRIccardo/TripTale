@@ -104,6 +104,22 @@ public class ModificaTappaFragment extends Fragment {
             }
         }
 
+        // --- RIPRISTINO DELLO STATO DOPO LA ROTAZIONE ---
+        if (savedInstanceState != null) {
+            // Recuperiamo i percorsi
+            percorsoFotoAttuale = savedInstanceState.getString("percorsoFotoAttuale");
+            percorsoNuovaFotoTemp = savedInstanceState.getString("percorsoNuovaFotoTemp");
+            String uriStr = savedInstanceState.getString("uriFotoTemporanea");
+
+            if (uriStr != null) uriFotoTemporanea = Uri.parse(uriStr);
+
+            // Se l'utente ha scattato una nuova foto (percorsoFotoAttuale diverso da quello nel DB)
+            // o se il ripristino ha riportato la foto scattata, carichiamola
+            if (percorsoFotoAttuale != null) {
+                imageAnteprima.setImageURI(Uri.fromFile(new File(percorsoFotoAttuale)));
+            }
+        }
+
         // --- GESTIONE BOTTONE SCATTO FOTO ---
         btnScatta.setOnClickListener(v -> {
             try {
@@ -180,15 +196,36 @@ public class ModificaTappaFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        // Se l'utente sta uscendo dalla schermata SENZA aver premuto "Salva"...
-        // e ha scattato una foto nuova...
-        if (!salvataggioCompletato && percorsoFotoAttuale != null && !percorsoFotoAttuale.equals(tappaCorrente.imagePath)) {
-            // Eliminiamo la foto nuova "orfana", mantenendo intatta quella vecchia sul telefono
-            if (!new File(percorsoFotoAttuale).delete()) {
-                Log.w("TripTale", "Impossibile eliminare il file o file già assente");
+
+        // Controllo: entriamo solo se l'utente sta uscendo dalla schermata SENZA salvare.
+        // Non dobbiamo fare nulla se l'utente sta solo ruotando il telefono
+        if (!requireActivity().isChangingConfigurations()) {
+            // Se l'utente sta uscendo dalla schermata SENZA aver premuto "Salva"...
+            // e ha scattato una foto nuova...
+            if (!salvataggioCompletato && percorsoFotoAttuale != null && !percorsoFotoAttuale.equals(tappaCorrente.imagePath)) {
+                // Eliminiamo la foto nuova "orfana", mantenendo intatta quella vecchia sul telefono
+                if (!new File(percorsoFotoAttuale).delete()) {
+                    Log.w("TripTale", "Impossibile eliminare il file o file già assente");
+                }
             }
         }
         imageAnteprima = null;
+    }
+    /**
+     * Metodo del ciclo di vita chiamato quando il Fragment viene distrutto per salvare lo stato attuale.
+     * @param outState L'eventuale stato salvato in precedenza.
+     */
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        // Salviamo le variabili fondamentali come stringhe
+        outState.putString("percorsoFotoAttuale", percorsoFotoAttuale);
+        outState.putString("percorsoNuovaFotoTemp", percorsoNuovaFotoTemp);
+
+        // Se c'è un'URI, la trasformiamo in stringa e la salviamo
+        if (uriFotoTemporanea != null) {
+            outState.putString("uriFotoTemporanea", uriFotoTemporanea.toString());
+        }
     }
 
     /**

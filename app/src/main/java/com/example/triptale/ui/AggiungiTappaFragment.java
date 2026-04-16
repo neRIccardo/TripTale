@@ -40,7 +40,6 @@ public class AggiungiTappaFragment extends Fragment {
     private boolean salvataggioCompletato = false;
     private String cloudIdViaggioCorrente = null;
 
-
     /**
      * Metodo del ciclo di vita chiamato alla creazione iniziale del Fragment.
      * Si occupa di estrarre in background gli ID (locale e cloud) del viaggio padre passati tramite Bundle,
@@ -96,6 +95,24 @@ public class AggiungiTappaFragment extends Fragment {
         Button btnScattaFoto = view.findViewById(R.id.btnScattaFoto);
         Button btnSalva = view.findViewById(R.id.btnSalvaTappa);
         imageAnteprima = view.findViewById(R.id.imageAnteprimaFoto);
+
+        // --- RIPRISTINO DELLO STATO DOPO LA ROTAZIONE ---
+        if (savedInstanceState != null) {
+            // Recuperiamo i percorsi
+            percorsoFotoAttuale = savedInstanceState.getString("percorsoFotoAttuale");
+            percorsoNuovaFotoTemp = savedInstanceState.getString("percorsoNuovaFotoTemp");
+
+            // Recuperiamo l'URI e ripristiniamo l'immagine a schermo
+            String uriString = savedInstanceState.getString("uriFotoTemporanea");
+            if (uriString != null) {
+                uriFotoTemporanea = Uri.parse(uriString);
+            }
+
+            // Se avevamo già scattato/selezionato una foto, la rimettiamo nell'ImageView
+            if (percorsoFotoAttuale != null) {
+                imageAnteprima.setImageURI(Uri.fromFile(new File(percorsoFotoAttuale)));
+            }
+        }
 
         // --- GESTIONE BOTTONE SCATTO FOTO ---
         btnScattaFoto.setOnClickListener(v -> {
@@ -160,13 +177,35 @@ public class AggiungiTappaFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        // Se sta uscendo SENZA salvare e aveva scattato una foto, cancelliamola
-        if (!salvataggioCompletato && percorsoFotoAttuale != null) {
-            if (!new File(percorsoFotoAttuale).delete()) {
-                Log.w("TripTale", "Impossibile eliminare il file o file già assente");
+
+        // Controllo: entriamo solo se l'utente sta uscendo dalla schermata SENZA salvare.
+        // Non dobbiamo fare nulla se l'utente sta solo ruotando il telefono
+        if (!requireActivity().isChangingConfigurations()) {
+            // Se sta uscendo SENZA salvare e aveva scattato una foto, cancelliamola
+            if (!salvataggioCompletato && percorsoFotoAttuale != null) {
+                if (!new File(percorsoFotoAttuale).delete()) {
+                    Log.w("TripTale", "Impossibile eliminare il file o file già assente");
+                }
             }
         }
         imageAnteprima = null;
+    }
+
+    /**
+     * Metodo del ciclo di vita chiamato quando il Fragment viene distrutto per salvare lo stato attuale.
+     * @param outState L'eventuale stato salvato in precedenza.
+     */
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        // Salviamo le variabili fondamentali come stringhe
+        outState.putString("percorsoFotoAttuale", percorsoFotoAttuale);
+        outState.putString("percorsoNuovaFotoTemp", percorsoNuovaFotoTemp);
+
+        // Se c'è un'URI, la trasformiamo in stringa e la salviamo
+        if (uriFotoTemporanea != null) {
+            outState.putString("uriFotoTemporanea", uriFotoTemporanea.toString());
+        }
     }
 
     /**
