@@ -94,4 +94,6 @@
     <string name="desc_miniatura_viaggio">Miniatura della copertina del viaggio</string>
     <string name="utente_loggato">#4CAF50</string>
     <string name="utente_non_loggato">#E73B18</string>
+    <string name="desc_btn_apri_mappa">Apre la mappa con le coordinate del viaggio</string>
+    <string name="manca_citta_btnApriMappa">Inserisci una città di destinazione per aprire la mappa</string>
 </resources>

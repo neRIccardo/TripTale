@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/sfondo_principale">
@@ -38,35 +39,53 @@
                         android:layout_height="wrap_content"
                         android:textColor="@color/bianco"
                         android:textSize="28sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:ellipsize="end"
+                        android:maxLines="1"/>
 
                     <TextView
                         android:id="@+id/textDateDettaglio"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textColor="@color/grigio_chiaro"
-                        android:textSize="16sp" />
+                        android:textSize="11sp" />
                 </LinearLayout>
 
                 <ImageButton
+                    android:id="@+id/btnApriMappa"
+                    android:paddingStart="10dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_gravity="center_vertical"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@android:drawable/ic_dialog_map"
+                    app:tint="@color/grigio_medio_chiaro"
+                    android:contentDescription="@string/desc_btn_modifica_viaggio"
+                    tools:ignore="RtlSymmetry" />
+
+                <ImageButton
                     android:id="@+id/btnModificaViaggio"
+                    android:paddingStart="15dp"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:layout_gravity="center_vertical"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:src="@android:drawable/ic_menu_edit"
                     app:tint="@color/verde_successo"
-                    android:contentDescription="@string/desc_btn_modifica_viaggio" />
+                    android:contentDescription="@string/desc_btn_apri_mappa"
+                    tools:ignore="RtlSymmetry" />
 
                 <ImageButton
                     android:id="@+id/btnEliminaViaggio"
+                    android:paddingStart="10dp"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:layout_gravity="center_vertical"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:src="@android:drawable/ic_menu_delete"
                     app:tint="@color/rosso_errore"
-                    android:contentDescription="@string/desc_btn_elimina_viaggio" />
+                    android:contentDescription="@string/desc_btn_elimina_viaggio"
+                    tools:ignore="RtlSymmetry" />
             </LinearLayout>
 
             <LinearLayout

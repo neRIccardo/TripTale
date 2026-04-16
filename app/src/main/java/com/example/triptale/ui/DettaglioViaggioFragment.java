@@ -1,5 +1,7 @@
 package com.example.triptale.ui;
 import android.app.AlertDialog;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -93,6 +95,7 @@ public class DettaglioViaggioFragment extends Fragment {
         scrollMeteo = view.findViewById(R.id.scrollMeteo);
         contenitoreMeteo = view.findViewById(R.id.contenitoreMeteo);
         textErroreMeteo = view.findViewById(R.id.textErroreMeteo);
+        ImageButton btnApriMappa = view.findViewById(R.id.btnApriMappa);
 
         if (viaggioCorrente != null) {
             // Popoliamo l'interfaccia
@@ -100,6 +103,27 @@ public class DettaglioViaggioFragment extends Fragment {
             String testoData = viaggioCorrente.dataInizio + getString(R.string.trattino) + viaggioCorrente.dataFine;
             textDate.setText(testoData);
         }
+
+        // --- GESTIONE BOTTONE APRI MAPPA ---
+        btnApriMappa.setOnClickListener(v ->{
+            // Controlla se la città è nulla o vuota
+            if (viaggioCorrente.cittaDestinazione == null || viaggioCorrente.cittaDestinazione.trim().isEmpty()) {
+                Toast.makeText(requireContext(), R.string.manca_citta_btnApriMappa, Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Uri gmUri= Uri.parse("geo:0,0?q=" + Uri.encode(viaggioCorrente.cittaDestinazione));
+            Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmUri);
+            mapIntent.setPackage("com.google.android.apps.maps"); // Forziamo l'apertura in Google Maps
+
+            // Controllo di sicurezza: verifica che ci sia un'app di mappe installata
+            if(mapIntent.resolveActivity(requireActivity().getPackageManager()) != null){
+                startActivity(mapIntent);
+            }
+            else{
+                Toast.makeText(getContext(), R.string.errore_geolocalizzazione, Toast.LENGTH_SHORT).show();
+            }
+        });
 
         // --- GESTIONE BOTTONE ELIMINA VIAGGIO ---
         btnElimina.setOnClickListener(v -> {
