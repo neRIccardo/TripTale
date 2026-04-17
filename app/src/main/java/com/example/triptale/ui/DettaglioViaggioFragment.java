@@ -213,23 +213,38 @@ public class DettaglioViaggioFragment extends Fragment {
                 AppDatabase db = AppDatabase.getInstance(context);
                 Viaggio v = db.viaggioDao().ottieniViaggioPerId(viaggioCorrente.id);
 
-                if (v != null) {
+                // Se il viaggio è nullo significa che è stato eliminato o il DB è stato svuotato dopo il logout
+                if (v == null) {
                     FragmentActivity activity = getActivity();
-                    // Verifica isAdded() e che la View non sia stata distrutta
-                    if (activity != null && isAdded() && getView() != null) {
+                    if (activity != null && isAdded()) {
                         activity.runOnUiThread(() -> {
-                            viaggioCorrente = v; // Aggiorniamo il viaggio
+                            // Avvisiamo l'utente
+                            Toast.makeText(context, R.string.viaggio_non_trovato, Toast.LENGTH_SHORT).show();
 
-                            // Aggiorniamo le scritte a schermo
-                            TextView textTitolo = requireView().findViewById(R.id.textTitoloDettaglio);
-                            TextView textDate = requireView().findViewById(R.id.textDateDettaglio);
-                            textTitolo.setText(v.titolo);
-                            String testoData = v.dataInizio + getString(R.string.trattino) + v.dataFine;
-                            textDate.setText(testoData);
-                            caricaMeteo(v);
+                            // Chiudiamo il fragment e torniamo indietro alla lista
+                            // Questo evita che l'utente veda una schermata bianca o con dati vecchi
+                            Navigation.findNavController(requireView()).popBackStack();
                         });
                     }
+                    return;
                 }
+
+                FragmentActivity activity = getActivity();
+                // Verifica isAdded() e che la View non sia stata distrutta
+                if (activity != null && isAdded() && getView() != null) {
+                    activity.runOnUiThread(() -> {
+                        viaggioCorrente = v; // Aggiorniamo il viaggio
+
+                        // Aggiorniamo le scritte a schermo
+                        TextView textTitolo = requireView().findViewById(R.id.textTitoloDettaglio);
+                        TextView textDate = requireView().findViewById(R.id.textDateDettaglio);
+                        textTitolo.setText(v.titolo);
+                        String testoData = v.dataInizio + getString(R.string.trattino) + v.dataFine;
+                        textDate.setText(testoData);
+                        caricaMeteo(v);
+                    });
+                }
+
             }).start();
         }
     }

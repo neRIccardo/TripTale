@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.navigation.Navigation;
@@ -85,6 +86,8 @@ public class ListaViaggiFragment extends Fragment {
                         .setMessage(getString(R.string.msg_logout, auth.getCurrentUser().getEmail()))
                         .setPositiveButton(R.string.logout, (dialog, which) -> {
                             auth.signOut();
+                            // Cancella le notifiche dell'utente appena uscito
+                            NotificationManagerCompat.from(requireContext()).cancelAll();
                             new Thread(() -> {
                                 Context context = getContext();
                                 if (context == null) return;
