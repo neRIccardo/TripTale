@@ -1,5 +1,6 @@
 package com.example.triptale.ui;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.navigation.Navigation;
 import com.example.triptale.database.AppDatabase;
 import com.example.triptale.network.FirebaseManager;
@@ -48,16 +50,20 @@ public class ModificaViaggioFragment extends Fragment {
                 if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
                     // L'utente ha scelto una foto, estraiamo il suo URI
                     Uri uriImmagineSelezionata = result.getData().getData();
-                    if (uriImmagineSelezionata != null) {
+
+                    FragmentActivity activity = getActivity();
+                    if (uriImmagineSelezionata != null && activity != null && isAdded()){
                         // Diciamo ad Android di non far scadere il permesso di lettura per questa foto
-                        requireActivity().getContentResolver().takePersistableUriPermission(
+                        activity.getContentResolver().takePersistableUriPermission(
                                 uriImmagineSelezionata,
                                 Intent.FLAG_GRANT_READ_URI_PERMISSION
                         );
                         // Salviamo l'indirizzo come stringa per metterlo nel Database
                         nuovoPercorsoImmagine = uriImmagineSelezionata.toString();
                         // Mostriamo la foto nel nostro quadratino
-                        imageCopertina.setImageURI(uriImmagineSelezionata);
+                        if (imageCopertina != null) {
+                            imageCopertina.setImageURI(uriImmagineSelezionata);
+                        }
                     }
                 }
             }
@@ -189,7 +195,10 @@ public class ModificaViaggioFragment extends Fragment {
 
             // Salviamo nel DB usando un Thread
             new Thread(() -> {
-                AppDatabase db = AppDatabase.getInstance(requireContext());
+                Context context = getContext();
+                if (context == null) return;
+
+                AppDatabase db = AppDatabase.getInstance(context);
                 Viaggio viaggioAggiornato = db.viaggioDao().ottieniViaggioPerId(viaggioCorrente.id);
                 if (viaggioAggiornato != null) {
                     viaggioCorrente.cloudId = viaggioAggiornato.cloudId;
@@ -202,16 +211,17 @@ public class ModificaViaggioFragment extends Fragment {
                 } else {
                     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                     if (user != null) {
-                        FirebaseManager.sincronizzaTutto(requireContext(), user.getUid(), null);
+                        FirebaseManager.sincronizzaTutto(context, user.getUid(), null);
                     }
                 }
 
-                if (!isAdded()) return;
-
-                requireActivity().runOnUiThread(() -> {
-                    Toast.makeText(requireContext(), R.string.viaggio_modificato, Toast.LENGTH_SHORT).show();
-                    Navigation.findNavController(view).popBackStack();
-                });
+                FragmentActivity activity = getActivity();
+                if (activity != null && isAdded()) {
+                    requireActivity().runOnUiThread(() -> {
+                        Toast.makeText(context, R.string.viaggio_modificato, Toast.LENGTH_SHORT).show();
+                        Navigation.findNavController(view).popBackStack();
+                    });
+                }
             }).start();
         });
     }

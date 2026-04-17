@@ -140,6 +140,10 @@ public class MeteoManager {
      * @param callback L'interfaccia su cui ritornare i risultati (onSuccess) o gli errori (onError).
      */
     public static void ottieniPrevisioni(Context context, String citta, String dataInizio, String dataFine, MeteoCallback callback) {
+        if (citta == null || citta.trim().isEmpty()) {
+            callback.onError("Nome città non valido");
+            return;
+        }
 
         // Creiamo la coda di richieste Volley usando l'Application Context per evitare Memory Leaks
         RequestQueue queue = Volley.newRequestQueue(context.getApplicationContext());

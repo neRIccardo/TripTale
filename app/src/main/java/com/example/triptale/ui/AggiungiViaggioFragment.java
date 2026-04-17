@@ -1,4 +1,5 @@
 package com.example.triptale.ui;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.navigation.Navigation;
 import com.example.triptale.database.AppDatabase;
 import com.example.triptale.network.FirebaseManager;
@@ -87,22 +89,26 @@ public class AggiungiViaggioFragment extends Fragment {
             Viaggio nuovoViaggio = new Viaggio(titolo, citta, dataInizio, dataFine);
 
             new Thread(() -> {
+                Context context = getContext();
+                if (context == null) return;
+
                 // Recuperiamo il database
-                AppDatabase db = AppDatabase.getInstance(requireContext());
+                AppDatabase db = AppDatabase.getInstance(context);
 
                 // Inseriamo il viaggio
                 long idGenerato = db.viaggioDao().inserisciViaggio(nuovoViaggio);
                 nuovoViaggio.id = (int) idGenerato;
-                FirebaseManager.aggiungiViaggio(requireContext(), nuovoViaggio);
+                FirebaseManager.aggiungiViaggio(context, nuovoViaggio);
 
-                if (!isAdded()) return;
-
-                // Torniamo sul thread principale (UI Thread) per aggiornare lo schermo
-                requireActivity().runOnUiThread(() -> {
-                    Toast.makeText(requireContext(), R.string.viaggio_creato_successo, Toast.LENGTH_SHORT).show();
-                    // Il NavController fa "Indietro" (come premere il tasto back del telefono)
-                    Navigation.findNavController(v).popBackStack();
-                });
+                FragmentActivity activity = getActivity();
+                if (activity != null && isAdded()) {
+                    // Torniamo sul thread principale (UI Thread) per aggiornare lo schermo
+                    activity.runOnUiThread(() -> {
+                        Toast.makeText(context, R.string.viaggio_creato_successo, Toast.LENGTH_SHORT).show();
+                        // Il NavController fa "Indietro" (come premere il tasto back del telefono)
+                        Navigation.findNavController(v).popBackStack();
+                    });
+                }
             }).start();
         });
     }

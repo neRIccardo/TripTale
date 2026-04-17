@@ -1,4 +1,5 @@
 package com.example.triptale.ui;
+import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.navigation.Navigation;
 import com.example.triptale.database.AppDatabase;
 import com.example.triptale.network.FirebaseManager;
@@ -123,11 +125,14 @@ public class ModificaTappaFragment extends Fragment {
         // --- GESTIONE BOTTONE SCATTO FOTO ---
         btnScatta.setOnClickListener(v -> {
             try {
-                File fileImmagine = ImageUtils.creaFileImmagine(requireContext());
+                Context context = getContext();
+                if (context == null) return;
+
+                File fileImmagine = ImageUtils.creaFileImmagine(context);
                 percorsoNuovaFotoTemp = fileImmagine.getAbsolutePath();
                 uriFotoTemporanea = FileProvider.getUriForFile(
-                        requireContext(),
-                        requireContext().getPackageName() + ".fileprovider",
+                        context,
+                        context.getPackageName() + ".fileprovider",
                         fileImmagine
                 );
                 scattaFotoLauncher.launch(uriFotoTemporanea);
@@ -160,7 +165,10 @@ public class ModificaTappaFragment extends Fragment {
 
             // Aggiorniamo il Database
             new Thread(() -> {
-                AppDatabase db = AppDatabase.getInstance(requireContext());
+                Context context = getContext();
+                if (context == null) return;
+
+                AppDatabase db = AppDatabase.getInstance(context);
                 Tappa tappaAggiornata = db.tappaDao().ottieniTappaPerId(tappaCorrente.id);
                 if (tappaAggiornata != null) {
                     tappaCorrente.cloudId = tappaAggiornata.cloudId;
@@ -172,16 +180,17 @@ public class ModificaTappaFragment extends Fragment {
                 } else {
                     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                     if (user != null) {
-                        FirebaseManager.sincronizzaTutto(requireContext(), user.getUid(), null);
+                        FirebaseManager.sincronizzaTutto(context, user.getUid(), null);
                     }
                 }
 
-                if (!isAdded()) return;
-
-                requireActivity().runOnUiThread(() -> {
-                    Toast.makeText(requireContext(), R.string.tappa_aggiornata, Toast.LENGTH_SHORT).show();
-                    Navigation.findNavController(view).popBackStack();
-                });
+                FragmentActivity activity = getActivity();
+                if (activity != null && isAdded()) {
+                    activity.runOnUiThread(() -> {
+                        Toast.makeText(context, R.string.tappa_aggiornata, Toast.LENGTH_SHORT).show();
+                        Navigation.findNavController(view).popBackStack();
+                    });
+                }
             }).start();
         });
     }
@@ -237,10 +246,13 @@ public class ModificaTappaFragment extends Fragment {
     private final ActivityResultLauncher<Uri> scattaFotoLauncher = registerForActivityResult(
             new ActivityResultContracts.TakePicture(),
             esitoPositivo -> {
+                Context context = getContext();
+                if (context == null || !isAdded()) return;
+
                 if (esitoPositivo) {
                     if (percorsoNuovaFotoTemp != null) {
                         // Applichiamo il watermark e ridimensionamento alla nuova foto
-                        ImageUtils.ridimensionaEApplicaWatermark(requireContext(), percorsoNuovaFotoTemp);
+                        ImageUtils.ridimensionaEApplicaWatermark(context, percorsoNuovaFotoTemp);
 
                         // Se l'utente aveva scattato un'altra foto "nuova" ma
                         // ha deciso di rifarla, cancelliamo quella precedente per non intasare la memoria

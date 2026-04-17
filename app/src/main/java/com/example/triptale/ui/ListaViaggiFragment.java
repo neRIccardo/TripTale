@@ -1,5 +1,6 @@
 package com.example.triptale.ui;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,6 +15,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.navigation.Navigation;
 import com.example.triptale.database.AppDatabase;
 import com.example.triptale.R;
@@ -84,16 +86,19 @@ public class ListaViaggiFragment extends Fragment {
                         .setPositiveButton(R.string.logout, (dialog, which) -> {
                             auth.signOut();
                             new Thread(() -> {
-                                AppDatabase db = AppDatabase.getInstance(requireContext());
-                                db.viaggioDao().eliminaViaggi();
+                                Context context = getContext();
+                                if (context == null) return;
 
-                                if (!isAdded()) return;
+                                AppDatabase.getInstance(context).viaggioDao().eliminaViaggi();
 
-                                requireActivity().runOnUiThread(() -> {
-                                    aggiornaColoreIcona(btnProfiloLogin);
-                                    Toast.makeText(requireContext(), R.string.logout_successo, Toast.LENGTH_SHORT).show();
-                                    caricaViaggiDalDatabase();
-                                });
+                                FragmentActivity activity = getActivity();
+                                if (activity != null && isAdded()) {
+                                    activity.runOnUiThread(() -> {
+                                        aggiornaColoreIcona(btnProfiloLogin);
+                                        Toast.makeText(context, R.string.logout_successo, Toast.LENGTH_SHORT).show();
+                                        caricaViaggiDalDatabase();
+                                    });
+                                }
                             }).start();
                         })
                         .setNegativeButton(R.string.annulla, null)
@@ -143,62 +148,67 @@ public class ListaViaggiFragment extends Fragment {
     private void caricaViaggiDalDatabase() {
         // Thread per recuperare i viaggi dal database
         new Thread(() -> {
+            Context context = getContext();
+            if (context == null) return;
+
             // Apriamo il Database e richiediamo la lista dei viaggi
-            AppDatabase db = AppDatabase.getInstance(requireContext());
+            AppDatabase db = AppDatabase.getInstance(context);
             List<Viaggio> viaggiSalvati = db.viaggioDao().ottieniViaggi();
 
-            if (!isAdded()) return;
+            FragmentActivity activity = getActivity();
+            if (activity != null && isAdded()) {
+                requireActivity().runOnUiThread(() -> {
+                    if (contenitoreViaggi == null) return;
+                    // Svuotiamo la lista per evitare duplicati se torniamo indietro
+                    contenitoreViaggi.removeAllViews();
 
-            requireActivity().runOnUiThread(() -> {
-                // Svuotiamo la lista per evitare duplicati se torniamo indietro
-                contenitoreViaggi.removeAllViews();
+                    if (viaggiSalvati.isEmpty()) {
+                        // Se la lista è vuota nascondiamo la lista e mostriamo il testo di "default"
+                        scrollView.setVisibility(View.GONE);
+                        textEmptyState.setVisibility(View.VISIBLE);
+                    } else {
+                        textEmptyState.setVisibility(View.GONE);
+                        scrollView.setVisibility(View.VISIBLE);
 
-                if (viaggiSalvati.isEmpty()) {
-                    // Se la lista è vuota nascondiamo la lista e mostriamo il testo di "default"
-                    scrollView.setVisibility(View.GONE);
-                    textEmptyState.setVisibility(View.VISIBLE);
-                } else {
-                    textEmptyState.setVisibility(View.GONE);
-                    scrollView.setVisibility(View.VISIBLE);
+                        for (Viaggio viaggio : viaggiSalvati) {
+                            // Creiamo il singolo rettangolino per questo viaggio
+                            View itemViaggio = getLayoutInflater().inflate(R.layout.item_viaggio, contenitoreViaggi, false);
+                            TextView textTitolo = itemViaggio.findViewById(R.id.textTitoloViaggio);
+                            TextView textDate = itemViaggio.findViewById(R.id.textDateViaggio);
+                            textTitolo.setText(viaggio.titolo);
 
-                    for (Viaggio viaggio : viaggiSalvati) {
-                        // Creiamo il singolo rettangolino per questo viaggio
-                        View itemViaggio = getLayoutInflater().inflate(R.layout.item_viaggio, contenitoreViaggi, false);
-                        TextView textTitolo = itemViaggio.findViewById(R.id.textTitoloViaggio);
-                        TextView textDate = itemViaggio.findViewById(R.id.textDateViaggio);
-                        textTitolo.setText(viaggio.titolo);
+                            String testoData = viaggio.dataInizio + getString(R.string.trattino) + viaggio.dataFine;
+                            textDate.setText(testoData);
 
-                        String testoData = viaggio.dataInizio + getString(R.string.trattino) + viaggio.dataFine;
-                        textDate.setText(testoData);
+                            ImageView imageCopertina = itemViaggio.findViewById(R.id.imageCopertina);
 
-                        ImageView imageCopertina = itemViaggio.findViewById(R.id.imageCopertina);
-
-                        if (viaggio.imagePath != null) {
-                            try {
-                                // Proviamo a caricare la foto salvata
-                                imageCopertina.setImageURI(android.net.Uri.parse(viaggio.imagePath));
-                            } catch (SecurityException e) {
-                                // Se i permessi sono saltati o la foto non esiste più,
-                                // non facciamo crashare l'app mettendo l'icona di default
+                            if (viaggio.imagePath != null) {
+                                try {
+                                    // Proviamo a caricare la foto salvata
+                                    imageCopertina.setImageURI(android.net.Uri.parse(viaggio.imagePath));
+                                } catch (SecurityException e) {
+                                    // Se i permessi sono saltati o la foto non esiste più,
+                                    // non facciamo crashare l'app mettendo l'icona di default
+                                    imageCopertina.setImageResource(android.R.drawable.ic_menu_camera);
+                                }
+                            } else {
+                                // Se non c'è proprio il percorso, mettiamo l'icona di default
                                 imageCopertina.setImageResource(android.R.drawable.ic_menu_camera);
                             }
-                        } else {
-                            // Se non c'è proprio il percorso, mettiamo l'icona di default
-                            imageCopertina.setImageResource(android.R.drawable.ic_menu_camera);
-                        }
 
-                        // --- GESTIONE CLICK SUL SINGOLO VIAGGIO ---
-                        itemViaggio.setOnClickListener(v -> {
-                            // Creiamo il Bundle e serializziamo Viaggio
-                            Bundle bundle = new Bundle();
-                            bundle.putParcelable("viaggio_selezionato", viaggio);
-                            Navigation.findNavController(v).navigate(R.id.action_listaViaggiFragment_to_dettaglioViaggioFragment, bundle);
-                        });
-                        // Aggiungiamo il rettangolino dentro il LinearLayout
-                        contenitoreViaggi.addView(itemViaggio);
+                            // --- GESTIONE CLICK SUL SINGOLO VIAGGIO ---
+                            itemViaggio.setOnClickListener(v -> {
+                                // Creiamo il Bundle e serializziamo Viaggio
+                                Bundle bundle = new Bundle();
+                                bundle.putParcelable("viaggio_selezionato", viaggio);
+                                Navigation.findNavController(v).navigate(R.id.action_listaViaggiFragment_to_dettaglioViaggioFragment, bundle);
+                            });
+                            // Aggiungiamo il rettangolino dentro il LinearLayout
+                            contenitoreViaggi.addView(itemViaggio);
+                        }
                     }
-                }
-            });
+                });
+            }
         }).start();
     }
 
@@ -209,8 +219,10 @@ public class ListaViaggiFragment extends Fragment {
      * @param btnProfilo L'ImageButton da ricolorare.
      */
     private void aggiornaColoreIcona(ImageButton btnProfilo) {
-        FirebaseAuth auth = FirebaseAuth.getInstance();
+        Context context = getContext();
+        if (context == null || !isAdded()) return;
 
+        FirebaseAuth auth = FirebaseAuth.getInstance();
         if (auth.getCurrentUser() != null) {
             // UTENTE LOGGATO: coloriamo l'icona di verde
             btnProfilo.setColorFilter(Color.parseColor(getString(R.string.utente_loggato)));

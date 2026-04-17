@@ -79,17 +79,19 @@ public class DateUtils {
      * @return true se tutti i parametri sono compilati correttamente, false altrimenti.
      */
     public static boolean validaCampiObbligatori(Context context, EditText editTitolo, EditText editDataInizio, EditText editDataFine, String titolo, String dataInizio, String dataFine) {
-        if (titolo.isEmpty()) {
+        if (context == null) return false;
+
+        if (titolo == null || titolo.isEmpty()) {
             editTitolo.setError(context.getString(R.string.errore_titolo_viaggio));
             editTitolo.requestFocus();
             return false;
         }
-        if (dataInizio.isEmpty()) {
+        if (dataInizio == null || dataInizio.isEmpty()) {
             editDataInizio.setError(context.getString(R.string.errore_generico));
             Toast.makeText(context, R.string.errore_data_partenza, Toast.LENGTH_SHORT).show();
             return false;
         }
-        if (dataFine.isEmpty()) {
+        if (dataFine == null || dataFine.isEmpty()) {
             editDataFine.setError(context.getString(R.string.errore_generico));
             Toast.makeText(context, R.string.errore_data_ritorno, Toast.LENGTH_SHORT).show();
             return false;

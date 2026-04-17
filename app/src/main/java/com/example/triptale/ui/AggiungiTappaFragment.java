@@ -1,4 +1,5 @@
 package com.example.triptale.ui;
+import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import androidx.activity.result.ActivityResultLauncher;
@@ -7,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.navigation.Navigation;
 
 import android.util.Log;
@@ -152,18 +154,22 @@ public class AggiungiTappaFragment extends Fragment {
             Tappa nuovaTappa = new Tappa(idViaggioCorrente, titoloInserito, noteInserite);
             nuovaTappa.imagePath = percorsoFotoAttuale;
             new Thread(() -> {
-                long idGenerato = AppDatabase.getInstance(requireContext()).tappaDao().inserisciTappa(nuovaTappa);
+                Context context = getContext();
+                if (context == null) return;
+
+                long idGenerato = AppDatabase.getInstance(context).tappaDao().inserisciTappa(nuovaTappa);
                 nuovaTappa.id = (int) idGenerato;
-                FirebaseManager.aggiungiTappa(requireContext(), nuovaTappa, cloudIdViaggioCorrente);
+                FirebaseManager.aggiungiTappa(context, nuovaTappa, cloudIdViaggioCorrente);
 
-                if (!isAdded()) return;
-
-                // Torniamo sul Main Thread per la grafica
-                requireActivity().runOnUiThread(() -> {
-                    Toast.makeText(requireContext(), R.string.tappa_salvata, Toast.LENGTH_SHORT).show();
-                    // Torniamo al cruscotto del viaggio
-                    Navigation.findNavController(view).popBackStack();
-                });
+                FragmentActivity activity = getActivity();
+                if (activity != null && isAdded()) {
+                    // Torniamo sul Main Thread per la grafica
+                    activity.runOnUiThread(() -> {
+                        Toast.makeText(context, R.string.tappa_salvata, Toast.LENGTH_SHORT).show();
+                        // Torniamo al cruscotto del viaggio
+                        Navigation.findNavController(view).popBackStack();
+                    });
+                }
             }).start();
         });
     }
@@ -217,9 +223,12 @@ public class AggiungiTappaFragment extends Fragment {
     private final ActivityResultLauncher<Uri> scattaFotoLauncher = registerForActivityResult(
             new ActivityResultContracts.TakePicture(),
             esitoPositivo -> {
+                Context context = getContext();
+                if (context == null || !isAdded()) return;
+
                 if (esitoPositivo) {
                     if (percorsoNuovaFotoTemp != null) {
-                        ImageUtils.ridimensionaEApplicaWatermark(requireContext(), percorsoNuovaFotoTemp);
+                        ImageUtils.ridimensionaEApplicaWatermark(context, percorsoNuovaFotoTemp);
                         // Se l'utente aveva GIA' scattato una foto in questa sessione
                         // e ha deciso di rifarla, cancelliamo quella precedente
                         if (percorsoFotoAttuale != null) {

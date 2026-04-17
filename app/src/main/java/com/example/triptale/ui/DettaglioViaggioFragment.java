@@ -1,5 +1,6 @@
 package com.example.triptale.ui;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.navigation.Navigation;
 import com.example.triptale.database.AppDatabase;
 import com.example.triptale.network.FirebaseManager;
@@ -117,10 +119,10 @@ public class DettaglioViaggioFragment extends Fragment {
             mapIntent.setPackage("com.google.android.apps.maps"); // Forziamo l'apertura in Google Maps
 
             // Controllo di sicurezza: verifica che ci sia un'app di mappe installata
-            if(mapIntent.resolveActivity(requireActivity().getPackageManager()) != null){
+            FragmentActivity activity = getActivity();
+            if (activity != null && mapIntent.resolveActivity(activity.getPackageManager()) != null) {
                 startActivity(mapIntent);
-            }
-            else{
+            } else {
                 Toast.makeText(getContext(), R.string.errore_geolocalizzazione, Toast.LENGTH_SHORT).show();
             }
         });
@@ -134,7 +136,11 @@ public class DettaglioViaggioFragment extends Fragment {
                     .setPositiveButton(R.string.elimina, (dialog, which) -> {
                         // Se l'utente clicca "Elimina", facciamo partire il Thread di eliminazione
                         new Thread(() -> {
-                            List <Tappa> tappeDelViaggio = AppDatabase.getInstance(requireContext()).tappaDao().ottieniTappeDelViaggio(viaggioCorrente.id);
+                            Context context = getContext();
+                            if (context == null) return;
+
+                            AppDatabase db = AppDatabase.getInstance(context);
+                            List <Tappa> tappeDelViaggio = db.tappaDao().ottieniTappeDelViaggio(viaggioCorrente.id);
                             for(Tappa tappa : tappeDelViaggio) {
                                 // Cancelliamo l'eventuale foto della tappa dalla memoria
                                 if (tappa.imagePath != null) {
@@ -154,14 +160,15 @@ public class DettaglioViaggioFragment extends Fragment {
                                 FirebaseManager.eliminaViaggio(viaggioCorrente.cloudId);
                             }
                             // Cancellazione notifiche "orfane"
-                            NotificationManagerCompat.from(requireContext()).cancel(viaggioCorrente.id);
+                            NotificationManagerCompat.from(context).cancel(viaggioCorrente.id);
 
-                            if (!isAdded()) return; // Protezione ciclo di vita
-
-                            requireActivity().runOnUiThread(() -> {
-                                Toast.makeText(requireContext(), R.string.viaggio_eliminato, Toast.LENGTH_SHORT).show();
-                                Navigation.findNavController(view).popBackStack();
-                            });
+                            FragmentActivity activity = getActivity();
+                            if (activity != null && isAdded()) {
+                                activity.runOnUiThread(() -> {
+                                    Toast.makeText(context, R.string.viaggio_eliminato, Toast.LENGTH_SHORT).show();
+                                    Navigation.findNavController(view).popBackStack();
+                                });
+                            }
                         }).start();
                     })
                     .setNegativeButton(R.string.annulla, null) // Se clicca annulla, la finestra si chiude da sola
@@ -200,22 +207,28 @@ public class DettaglioViaggioFragment extends Fragment {
 
             // Ricarichiamo le informazioni del viaggio (es. se abbiamo cambiato titolo o date)
             new Thread(() -> {
-                Viaggio v = AppDatabase.getInstance(requireContext()).viaggioDao().ottieniViaggioPerId(viaggioCorrente.id);
+                Context context = getContext();
+                if (context == null) return;
+
+                AppDatabase db = AppDatabase.getInstance(context);
+                Viaggio v = db.viaggioDao().ottieniViaggioPerId(viaggioCorrente.id);
 
                 if (v != null) {
-                    if (!isAdded()) return;
+                    FragmentActivity activity = getActivity();
+                    // Verifica isAdded() e che la View non sia stata distrutta
+                    if (activity != null && isAdded() && getView() != null) {
+                        activity.runOnUiThread(() -> {
+                            viaggioCorrente = v; // Aggiorniamo il viaggio
 
-                    requireActivity().runOnUiThread(() -> {
-                        viaggioCorrente = v; // Aggiorniamo il viaggio
-
-                        // Aggiorniamo le scritte a schermo
-                        TextView textTitolo = requireView().findViewById(R.id.textTitoloDettaglio);
-                        TextView textDate = requireView().findViewById(R.id.textDateDettaglio);
-                        textTitolo.setText(v.titolo);
-                        String testoData = v.dataInizio + getString(R.string.trattino) + v.dataFine;
-                        textDate.setText(testoData);
-                        caricaMeteo(v);
-                    });
+                            // Aggiorniamo le scritte a schermo
+                            TextView textTitolo = requireView().findViewById(R.id.textTitoloDettaglio);
+                            TextView textDate = requireView().findViewById(R.id.textDateDettaglio);
+                            textTitolo.setText(v.titolo);
+                            String testoData = v.dataInizio + getString(R.string.trattino) + v.dataFine;
+                            textDate.setText(testoData);
+                            caricaMeteo(v);
+                        });
+                    }
                 }
             }).start();
         }

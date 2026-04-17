@@ -1,4 +1,5 @@
 package com.example.triptale.ui;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -85,22 +86,29 @@ public class LoginFragment extends Fragment {
 
             mAuth.signInWithEmailAndPassword(email, password)
                     .addOnSuccessListener(authResult -> {
-                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                        if (user != null) {
-                            // Otteniamo l'ID univoco dell'utente appena loggato
-                            String userId = user.getUid();
-                            FirebaseManager.sincronizzaTutto(requireContext(), userId, () -> {
-                                Toast.makeText(requireContext(), R.string.login_successo, Toast.LENGTH_SHORT).show();
-                                Navigation.findNavController(view).popBackStack();
-                            });
+                        Context context = getContext();
+                        if (context != null && isAdded()) {
+                            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                            if (user != null) {
+                                // Otteniamo l'ID univoco dell'utente appena loggato
+                                String userId = user.getUid();
+                                FirebaseManager.sincronizzaTutto(context, userId, () -> {
+                                    if (isAdded() && getContext() != null) {
+                                        Toast.makeText(getContext(), R.string.login_successo, Toast.LENGTH_SHORT).show();
+                                        Navigation.findNavController(view).popBackStack();
+                                    }
+                                });
+                            }
                         }
                     })
                     .addOnFailureListener(e -> {
-                        if (e instanceof FirebaseAuthInvalidCredentialsException ||
-                                e instanceof FirebaseAuthInvalidUserException) {
-                            mostraErrore(textErrore, getString(R.string.errore_credenziali_errate));
-                        } else {
-                            mostraErrore(textErrore, getString(R.string.errore_connessione));
+                        if (isAdded()) {
+                            if (e instanceof FirebaseAuthInvalidCredentialsException ||
+                                    e instanceof FirebaseAuthInvalidUserException) {
+                                mostraErrore(textErrore, getString(R.string.errore_credenziali_errate));
+                            } else {
+                                mostraErrore(textErrore, getString(R.string.errore_connessione));
+                            }
                         }
                     });
         });
@@ -126,25 +134,32 @@ public class LoginFragment extends Fragment {
 
             mAuth.createUserWithEmailAndPassword(email, password)
                     .addOnSuccessListener(authResult -> {
-                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                        if (user != null) {
-                            // Otteniamo l'ID univoco dell'utente appena registrato
-                            String userId = user.getUid();
-                            FirebaseManager.sincronizzaTutto(requireContext(), userId, () -> {
-                                Toast.makeText(requireContext(), R.string.login_successo, Toast.LENGTH_SHORT).show();
-                                Navigation.findNavController(view).popBackStack();
-                            });
+                        Context context = getContext();
+                        if (context != null && isAdded()) {
+                            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                            if (user != null) {
+                                // Otteniamo l'ID univoco dell'utente appena registrato
+                                String userId = user.getUid();
+                                FirebaseManager.sincronizzaTutto(context, userId, () -> {
+                                    if (isAdded() && getContext() != null) {
+                                        Toast.makeText(getContext(), R.string.login_successo, Toast.LENGTH_SHORT).show();
+                                        Navigation.findNavController(view).popBackStack();
+                                    }
+                                });
+                            }
                         }
                     })
                     .addOnFailureListener(e -> {
-                        if (e instanceof FirebaseAuthWeakPasswordException) {
-                            mostraErrore(textErrore, getString(R.string.err_password_debole));
-                        } else if (e instanceof FirebaseAuthUserCollisionException) {
-                            mostraErrore(textErrore, getString(R.string.err_email_esistente));
-                        } else if (e instanceof FirebaseAuthInvalidCredentialsException) {
-                            mostraErrore(textErrore, getString(R.string.err_email_invalida));
-                        } else {
-                            mostraErrore(textErrore, getString(R.string.err_generico_account));
+                        if (isAdded()) {
+                            if (e instanceof FirebaseAuthWeakPasswordException) {
+                                mostraErrore(textErrore, getString(R.string.err_password_debole));
+                            } else if (e instanceof FirebaseAuthUserCollisionException) {
+                                mostraErrore(textErrore, getString(R.string.err_email_esistente));
+                            } else if (e instanceof FirebaseAuthInvalidCredentialsException) {
+                                mostraErrore(textErrore, getString(R.string.err_email_invalida));
+                            } else {
+                                mostraErrore(textErrore, getString(R.string.err_generico_account));
+                            }
                         }
                     });
         });
