@@ -29,6 +29,12 @@ L'applicazione è sviluppata interamente in **Java** seguendo le linee guida e l
 
 ---
 
+## ⚠️ Limiti Noti e Scelte Progettuali (Trade-offs)
+* **Sincronizzazione Immagini:** Attualmente, l'architettura cloud sincronizza in tempo reale tutti i dati strutturati (testi, date, percorsi file). Le immagini fisiche ad alta risoluzione rimangono archiviate esclusivamente nello storage locale del dispositivo. Questa scelta progettuale è stata fatta per privilegiare l'approccio *Offline-First* e limitare il consumo del piano dati dell'utente. L'implementazione di **Firebase Storage** (con librerie come Glide/Picasso per il caching) per il backup in cloud dei file multimediali è uno dei primi obiettivi per le release future.
+* **Categorizzazione Intelligente (Deep Learning):** L'integrazione di un modello di rete neurale convoluzionale (CNN) per l'etichettatura automatica delle foto (es. riconoscere "Mare", "Città", "Natura") è uno dei prossimi upgrade in programma. Per questa versione 1.0 si è data priorità alla stabilità architetturale (Thread, Database, Service) e al mantenimento di un peso ridotto (footprint) del file APK.
+
+---
+
 ## ⚙️ Installazione e Configurazione
 
 Se desideri clonare e compilare questo progetto localmente, segui questi passaggi:
