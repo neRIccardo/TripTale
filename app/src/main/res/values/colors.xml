@@ -13,4 +13,5 @@
     <color name="grigio_scuro">#888888</color>
     <color name="rosso_errore">#FF5252</color>
     <color name="verde_successo">#4CAF50</color>
+    <color name="triptale_background">#FFFFFF</color>
 </resources>
