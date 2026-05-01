@@ -41,7 +41,7 @@ public class FirebaseManager {
         new Thread(() -> {
             try {
                 AppDatabase roomDb = AppDatabase.getInstance(context.getApplicationContext());
-                java.util.List<Viaggio> viaggiLocali = roomDb.viaggioDao().ottieniViaggi();
+                List<Viaggio> viaggiLocali = roomDb.viaggioDao().ottieniViaggi();
 
                 // 1. UPLOAD VIAGGI OFFLINE
                 for (Viaggio viaggio : viaggiLocali) {
